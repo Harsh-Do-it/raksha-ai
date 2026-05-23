@@ -1,5 +1,7 @@
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ImageUploader from "../components/RoadIssue/ImageUploader";
+import DetectionResult from "../components/RoadIssue/DetectionResult";
 
 /* ─────────────────────────────────────────────────────────────
    ReportIssue.jsx — AI-powered road issue reporting page
@@ -62,49 +64,24 @@ function simulateDetection(fileName) {
   return results[Math.floor(Math.random() * results.length)];
 }
 
-/* ── Confidence ring ──────────────────────────────────────────── */
-function ConfidenceRing({ pct, color }) {
-  const r = 36, circ = 2 * Math.PI * r;
-  return (
-    <svg width="90" height="90" viewBox="0 0 90 90">
-      <circle cx="45" cy="45" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6"/>
-      <circle cx="45" cy="45" r={r} fill="none" stroke={color} strokeWidth="6"
-        strokeDasharray={circ} strokeDashoffset={circ * (1 - pct)}
-        strokeLinecap="round" transform="rotate(-90 45 45)"
-        style={{ transition:"stroke-dashoffset 1s cubic-bezier(0.16,1,0.3,1)" }}
-      />
-      <text x="45" y="49" textAnchor="middle" fill="#f1f5f9"
-        fontSize="14" fontFamily="'Bebas Neue',cursive" letterSpacing="1">
-        {Math.round(pct * 100)}%
-      </text>
-    </svg>
-  );
-}
-
 export default function ReportIssue() {
-  const navigate  = useNavigate();
-  const fileInput = useRef(null);
-  const [dragging, setDragging]   = useState(false);
-  const [preview,  setPreview]    = useState(null);
-  const [fileName, setFileName]   = useState(null);
+  const navigate = useNavigate();
+  const [preview, setPreview] = useState(null);
   const [detecting, setDetecting] = useState(false);
-  const [result,   setResult]     = useState(null);
+  const [result, setResult] = useState(null);
   const [issueType, setIssueType] = useState(null);
-  const [severity,  setSeverity]  = useState(null);
-  const [road,      setRoad]      = useState("");
-  const [area,      setArea]      = useState("");
-  const [desc,      setDesc]      = useState("");
+  const [severity, setSeverity] = useState(null);
+  const [road, setRoad] = useState("");
+  const [area, setArea] = useState("");
+  const [desc, setDesc] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   function handleFile(file) {
     if (!file || !file.type.startsWith("image/")) return;
-    setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = e => setPreview(e.target.result);
-    reader.readAsDataURL(file);
+
     setResult(null);
-    // Simulate AI detection
     setDetecting(true);
+
     setTimeout(() => {
       const det = simulateDetection(file.name);
       setResult(det);
@@ -113,11 +90,6 @@ export default function ReportIssue() {
       setDetecting(false);
     }, 2000);
   }
-
-  const onDrop = useCallback(e => {
-    e.preventDefault(); setDragging(false);
-    handleFile(e.dataTransfer.files[0]);
-  }, []);
 
   function handleSubmit() {
     if (!road.trim()) return;
@@ -172,73 +144,17 @@ export default function ReportIssue() {
 
           {/* ── Left: Upload + AI result ── */}
           <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
-
-            {/* Drop zone */}
-            <div
-              onDragOver={e => { e.preventDefault(); setDragging(true); }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={onDrop}
-              onClick={() => fileInput.current?.click()}
-              style={{
-                borderRadius:12, border:`1.5px dashed ${dragging?"#dc2626":"rgba(255,255,255,0.1)"}`,
-                background: dragging ? "rgba(220,38,38,0.05)" : preview ? "transparent" : "rgba(255,255,255,0.02)",
-                cursor:"pointer", overflow:"hidden", transition:"all 0.18s",
-                minHeight: preview ? 220 : 180,
-                display:"flex", alignItems:"center", justifyContent:"center",
-                position:"relative",
-              }}
-            >
-              {preview ? (
-                <img src={preview} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover", minHeight:220 }} />
-              ) : (
-                <div style={{ textAlign:"center", padding:32 }}>
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round" style={{ margin:"0 auto 12px",display:"block" }}>
-                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                  </svg>
-                  <div style={{ fontFamily:"'DM Mono',monospace",fontSize:12,color:"rgba(255,255,255,0.3)",marginBottom:4 }}>
-                    Drop road image here
-                  </div>
-                  <div style={{ fontSize:11,color:"rgba(255,255,255,0.18)" }}>or click to browse · JPG, PNG, WEBP</div>
-                </div>
-              )}
-              <input ref={fileInput} type="file" accept="image/*" style={{ display:"none" }}
-                onChange={e => handleFile(e.target.files[0])} />
-            </div>
-
-            {/* AI detection result */}
-            {detecting && (
-              <div style={{ background:"#080c14",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:20,display:"flex",alignItems:"center",gap:14 }}>
-                <div style={{ width:32,height:32,borderRadius:"50%",border:"2.5px solid rgba(220,38,38,0.15)",borderTopColor:"#dc2626",animation:"spin 0.9s linear infinite",flexShrink:0 }} />
-                <div>
-                  <div style={{ fontFamily:"'DM Mono',monospace",fontSize:12,color:"rgba(255,255,255,0.6)",marginBottom:2 }}>Running AI detection…</div>
-                  <div style={{ fontSize:11,color:"rgba(255,255,255,0.25)" }}>OpenCV · Classification model</div>
-                </div>
-                <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-              </div>
-            )}
-
-            {result && !detecting && (
-              <div style={{ background:"#080c14",border:"1px solid rgba(34,197,94,0.2)",borderRadius:12,padding:20,animation:"slideIn 0.3s ease" }}>
-                <div style={{ display:"flex",alignItems:"center",gap:10,marginBottom:14 }}>
-                  <span style={{ fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:1.5,padding:"3px 8px",borderRadius:4,background:"rgba(34,197,94,0.1)",border:"1px solid rgba(34,197,94,0.2)",color:"#22c55e" }}>AI DETECTED</span>
-                  <span style={{ fontFamily:"'Bebas Neue',cursive",fontSize:18,letterSpacing:2,color:"#f1f5f9" }}>{result.label}</span>
-                </div>
-                <div style={{ display:"flex",alignItems:"center",gap:20 }}>
-                  <ConfidenceRing pct={result.confidence} color={sevConf.color} />
-                  <div>
-                    <div style={{ fontSize:10,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.3)",marginBottom:4,letterSpacing:1 }}>CONFIDENCE SCORE</div>
-                    <div style={{ fontSize:12,color:"rgba(255,255,255,0.5)",lineHeight:1.6 }}>{result.description}</div>
-                    <div style={{ marginTop:8,display:"flex",alignItems:"center",gap:6 }}>
-                      <span style={{ width:6,height:6,borderRadius:"50%",background:sevConf.color,flexShrink:0 }} />
-                      <span style={{ fontSize:11,color:sevConf.color,fontFamily:"'DM Mono',monospace",fontWeight:500 }}>
-                        {sevConf.label} severity
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <style>{`@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
-              </div>
-            )}
+            <ImageUploader
+              onImageSelected={(file) => handleFile(file)}
+              onPreview={setPreview}
+              title="Upload road image"
+              subtitle="Drag and drop your image or browse your device to start AI detection."
+            />
+            <DetectionResult
+              detection={result}
+              imagePreview={preview}
+              loading={detecting}
+            />
           </div>
 
           {/* ── Right: Form ── */}
