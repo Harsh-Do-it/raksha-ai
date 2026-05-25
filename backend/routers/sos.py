@@ -87,6 +87,8 @@ class RakshaAISOS:
         if not self.location:
             self.get_live_location()
 
+        location = self.location or {}
+
         message = f"""
         ===============================
                 RAKSHA AI SOS ALERT
@@ -98,10 +100,10 @@ class RakshaAISOS:
         Possible road accident detected.
 
         Location Details:
-        City: {self.location.get('city')}
-        Region: {self.location.get('region')}
-        Country: {self.location.get('country')}
-        Coordinates: {self.location.get('coordinates')}
+        City: {location.get('city')}
+        Region: {location.get('region')}
+        Country: {location.get('country')}
+        Coordinates: {location.get('coordinates')}
 
         Immediate assistance may be required.
         """
