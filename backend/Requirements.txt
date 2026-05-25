@@ -1,0 +1,6 @@
+Flask>=3.0,<4
+requests>=2.31,<3
+Pillow>=10,<11
+numpy>=1.26,<2
+firebase-admin>=6.5,<7
+python-dotenv>=1.0,<2

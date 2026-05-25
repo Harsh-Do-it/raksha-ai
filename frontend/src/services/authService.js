@@ -35,7 +35,7 @@ const FIREBASE_CONFIG = {
 };
 
 const USE_MOCK  = process.env.REACT_APP_USE_MOCK === "true" || process.env.NODE_ENV === "development";
-const BASE_URL  = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api/v1";
+const BASE_URL  = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000";
 
 // ── Error class ───────────────────────────────────────────────────────────────
 export class AuthError extends Error {
