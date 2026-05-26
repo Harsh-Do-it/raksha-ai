@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: raksha-backend
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+      - ./ai-models:/ai-models
+    ports:
+      - "8000:8000"
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    working_dir: /app
+    depends_on:
+      - ai-models
+
+  frontend:
+    build: ./frontend
+    container_name: raksha-frontend
+    env_file:
+      - .env
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    working_dir: /app
+    depends_on:
+      - backend
+
+  ai-models:
+    build:
+      context: ./ai-models
+    container_name: raksha-ai-models
+    volumes:
+      - ./ai-models:/ai-models
+    working_dir: /ai-models
+    command: tail -f /dev/null # Keeps the container running for backend access
+
+networks:
+  default:
+    driver: bridge

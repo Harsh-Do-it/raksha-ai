@@ -1,0 +1,25 @@
+# Node modules
+node_modules/
+
+# Python virtual environments
+.venv/
+venv/
+
+# Environment variables
+.env
+.env.*
+
+# Model weights and artifacts
+**/model_weights/
+**/artifacts/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VSCode settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
