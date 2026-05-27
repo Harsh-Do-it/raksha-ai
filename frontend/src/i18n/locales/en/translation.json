@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "Raksha AI",
+    "subtitle": "Smart Road Safety Management"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "reportIssue": "Report Issue",
+    "riskAlert": "Risk Alert",
+    "sos": "SOS",
+    "legal": "Legal Info"
+  },
+  "common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "language": "Language"
+  },
+  "reports": {
+    "title": "Report Issue",
+    "description": "Report road issues, potholes, and hazards",
+    "uploadImage": "Upload Image",
+    "selectLocation": "Select Location",
+    "severity": "Severity Level",
+    "severityHigh": "High",
+    "severityMedium": "Medium",
+    "severityLow": "Low",
+    "issueType": "Issue Type",
+    "pothole": "Pothole",
+    "accident": "Accident Prone Area",
+    "flooding": "Flooding",
+    "roadDamage": "Road Damage",
+    "submit": "Submit Report",
+    "successMessage": "Report submitted successfully",
+    "errorMessage": "Failed to submit report"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "warnings": "Warnings",
+    "alerts": "Alerts",
+    "highSeverity": "High Severity Alert",
+    "newReportNearby": "New report nearby",
+    "roadConditionChanged": "Road condition has changed",
+    "emergencySOS": "Emergency SOS Alert",
+    "markAsRead": "Mark as Read",
+    "clearAll": "Clear All"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "overview": "Overview",
+    "activeAlerts": "Active Alerts",
+    "reportsToday": "Reports Today",
+    "severityDistribution": "Severity Distribution",
+    "hotspots": "Accident Hotspots",
+    "recentReports": "Recent Reports",
+    "preferences": "Preferences",
+    "minSeverity": "Minimum Severity",
+    "zones": "Zones",
+    "pushNotifications": "Push Notifications",
+    "smsNotifications": "SMS Notifications"
+  },
+  "sos": {
+    "title": "Emergency SOS",
+    "description": "Get immediate help in case of emergency",
+    "buttonLabel": "Press for Emergency",
+    "nearbyHospitals": "Nearby Hospitals",
+    "emergencyServices": "Emergency Services",
+    "contactingServices": "Contacting emergency services...",
+    "locationSharing": "Sharing your location"
+  },
+  "map": {
+    "title": "Map View",
+    "noData": "No incidents to display",
+    "zoomToFit": "Zoom to Fit",
+    "currentLocation": "Current Location"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "notifications": "Notifications",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "about": "About Raksha AI",
+    "version": "Version"
+  }
+}

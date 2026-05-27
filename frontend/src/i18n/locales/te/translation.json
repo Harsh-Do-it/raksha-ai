@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "రక్ష AI",
+    "subtitle": "స్మార్ట్ రోడ్ సేఫ్టీ మేనేజమెంట్"
+  },
+  "navigation": {
+    "home": "హోమ్",
+    "dashboard": "డ్యాష్‌బోర్డ్",
+    "reportIssue": "సమస్య నివేదించండి",
+    "riskAlert": "ఝుకి అలర్ట్",
+    "sos": "SOS",
+    "legal": "చట్ట సమాచారం"
+  },
+  "common": {
+    "submit": "సమర్పించండి",
+    "cancel": "రద్దు",
+    "save": "సేవ్ చేయండి",
+    "delete": "తొలగించండి",
+    "edit": "సవరించండి",
+    "loading": "లోడ్ అవుతోంది...",
+    "error": "లోపం",
+    "success": "విజయం",
+    "warning": "హెచ్చరిక",
+    "language": "భాష"
+  },
+  "reports": {
+    "title": "సమస్య నివేదించండి",
+    "description": "రోడ్ సమస్యలు, గుండెలు మరియు ప్రమాదాలను నివేదించండి",
+    "uploadImage": "ఇమేజ్ అప్‌లోడ్ చేయండి",
+    "selectLocation": "స్థానం ఎంచుకోండి",
+    "severity": "తీవ్రత స్థితి",
+    "severityHigh": "ఎక్కువ",
+    "severityMedium": "మధ్యम",
+    "severityLow": "తక్కువ",
+    "issueType": "సమస్య రకం",
+    "pothole": "గుండె",
+    "accident": "ప్రమాదం-ఉపయోగపడిన ప్రాంతం",
+    "flooding": "వరద",
+    "roadDamage": "రోడ్ నష్టం",
+    "submit": "నివేదనను సమర్పించండి",
+    "successMessage": "నివేదన విజయవంతంగా సమర్పించబడింది",
+    "errorMessage": "నివేదనను సమర్పించడంలో విఫలమైంది"
+  },
+  "notifications": {
+    "title": "నోటిఫికేషన్లు",
+    "warnings": "హెచ్చరికలు",
+    "alerts": "అలర్టులు",
+    "highSeverity": "ఉચ్చ తీవ్రత అలర్ట్",
+    "newReportNearby": "సమీపంలో నতून నివేదన",
+    "roadConditionChanged": "రోడ్ పరిస్థితి మార్చబడింది",
+    "emergencySOS": "ఎమర్జెన్సీ SOS అలర్ట్",
+    "markAsRead": "చదివినట్లు గుర్తించండి",
+    "clearAll": "అన్నీ క్లియర్ చేయండి"
+  },
+  "dashboard": {
+    "title": "డ్యాష్‌బోర్డ్",
+    "overview": "సమీక్ష",
+    "activeAlerts": "క్రియాశీల అలర్టులు",
+    "reportsToday": "ఈ రోజు నివేదనలు",
+    "severityDistribution": "తీవ్రత పంపిణీ",
+    "hotspots": "ప్రమాదం హాట్‌స్పాట్‌లు",
+    "recentReports": "ఇటీవలి నివేదనలు",
+    "preferences": "ప్రాధాన్యతలు",
+    "minSeverity": "కనీస తీవ్రత",
+    "zones": "జోన్‌లు",
+    "pushNotifications": "పుష్ నోటిఫికేషన్లు",
+    "smsNotifications": "SMS నోటిఫికేషన్లు"
+  },
+  "sos": {
+    "title": "ఎమర్జెన్సీ SOS",
+    "description": "ఎమర్జెన్సీ సందర్భంలో తక్షణ సహాయం పొందండి",
+    "buttonLabel": "ఎమర్జెన్సీ కోసం నొక్కండి",
+    "nearbyHospitals": "సమీపంలో ఉన్న ఆసుపత్రులు",
+    "emergencyServices": "ఎమర్జెన్సీ సేవలు",
+    "contactingServices": "ఎమర్జెన్సీ సేవలను సంప్రదించుకుంటున్నాము...",
+    "locationSharing": "మీ స్థానం భాగస్వామ్యం చేయబడుతోంది"
+  },
+  "map": {
+    "title": "మ్యాప్ వీక్ష",
+    "noData": "ప్రదర్శించడానికి ఘటనలు లేవు",
+    "zoomToFit": "సరిపోయేలా జూమ్ చేయండి",
+    "currentLocation": "ప్రస్తుత స్థానం"
+  },
+  "settings": {
+    "title": "సెట్టింగ్‌లు",
+    "language": "భాష",
+    "notifications": "నోటిఫికేషన్లు",
+    "privacyPolicy": "గోప్యతా విధానం",
+    "termsOfService": "సేవ నిబంధనలు",
+    "about": "రక్ష AI గురించి",
+    "version": "సంస్కరణ"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "രക്ഷ AI",
+    "subtitle": "സ്മാർട്ട് റോഡ് സേഫ്റ്റി മാനേജ്മെൻ്റ്"
+  },
+  "navigation": {
+    "home": "ഹോം",
+    "dashboard": "ഡാഷ്‌ബോർഡ്",
+    "reportIssue": "പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക",
+    "riskAlert": "അപകട സതർക്കത",
+    "sos": "SOS",
+    "legal": "നിയമ വിവരങ്ങൾ"
+  },
+  "common": {
+    "submit": "സമർപ്പിക്കുക",
+    "cancel": "റദ്ദാക്കുക",
+    "save": "സംരക്ഷിക്കുക",
+    "delete": "ഇല്ലാതാക്കുക",
+    "edit": "പ്രയാസിച്ചെടുക്കുക",
+    "loading": "ലോഡ് ചെയ്യുകയാണ്...",
+    "error": "പിശക്",
+    "success": "സമ്മതി",
+    "warning": "മുന്നറിപ്പ്",
+    "language": "ഭാഷ"
+  },
+  "reports": {
+    "title": "പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക",
+    "description": "റോഡ് പ്രശ്നങ്ങൾ, കുഴികൾ, അപകടങ്ങൾ റിപ്പോർട്ട് ചെയ്യുക",
+    "uploadImage": "ചിത്രം അപ്പ്ലോഡ് ചെയ്യുക",
+    "selectLocation": "സ്ഥാനം തിരഞ്ഞെടുക്കുക",
+    "severity": "ഗുരുത്വ നിലവാരം",
+    "severityHigh": "ഉയർന്ന",
+    "severityMedium": "മധ്യമ",
+    "severityLow": "താഴ്ന്ന",
+    "issueType": "പ്രശ്നത്തിന്റെ തരം",
+    "pothole": "കുഴി",
+    "accident": "അപകട സാധ്യതയുള്ള മേഖല",
+    "flooding": "വെള്ളപ്പിച്ചിലുകൾ",
+    "roadDamage": "റോഡ് നാശം",
+    "submit": "റിപ്പോർട്ട് സമർപ്പിക്കുക",
+    "successMessage": "റിപ്പോർട്ട് വിജയകരമായി സമർപ്പിച്ചു",
+    "errorMessage": "റിപ്പോർട്ട് സമർപ്പിക്കുവാൻ പരാജയപ്പെട്ടു"
+  },
+  "notifications": {
+    "title": "അറിയിപ്പുകൾ",
+    "warnings": "മുന്നറിപ്പുകൾ",
+    "alerts": "സതർക്കതകൾ",
+    "highSeverity": "ഉയർന്ന ഗുരുത്വത്തിന്റെ സതർക്കത",
+    "newReportNearby": "സമീപത്ത് പുതിയ റിപ്പോർട്ട്",
+    "roadConditionChanged": "റോഡ് സ്ഥിതി മാറിയിരിക്കുന്നു",
+    "emergencySOS": "എമർജൻസി SOS സതർക്കത",
+    "markAsRead": "വായിച്ചതായി അടയാളപ്പെടുത്തുക",
+    "clearAll": "എല്ലാം മായ്ക്കുക"
+  },
+  "dashboard": {
+    "title": "ഡാഷ്‌ബോർഡ്",
+    "overview": "അവലോകനം",
+    "activeAlerts": "സജീവ സതർക്കതകൾ",
+    "reportsToday": "ഇന്നത്തെ റിപ്പോർട്ടുകൾ",
+    "severityDistribution": "ഗുരുത്വ വിതരണം",
+    "hotspots": "അപകട ഹോട്ട്സ്പോട്ടുകൾ",
+    "recentReports": "സമീപകാല റിപ്പോർട്ടുകൾ",
+    "preferences": "മുൻഗണനകൾ",
+    "minSeverity": "ഏറ്റവും കുറഞ്ഞ ഗുരുത്വം",
+    "zones": "മേഖലകൾ",
+    "pushNotifications": "പുഷ് അറിയിപ്പുകൾ",
+    "smsNotifications": "SMS അറിയിപ്പുകൾ"
+  },
+  "sos": {
+    "title": "എമർജൻസി SOS",
+    "description": "എമർജൻസി സാഹചര്യത്തിൽ തൽക്ഷണ സഹായം ലഭിക്കുക",
+    "buttonLabel": "എമർജൻസിയുടെ ബട്ടൺ അമർത്തുക",
+    "nearbyHospitals": "സമീപ സ്ഥാപനങ്ങൾ",
+    "emergencyServices": "എമർജൻസി സേവനങ്ങൾ",
+    "contactingServices": "എമർജൻസി സേവനങ്ങളുമായി ബന്ധപ്പെടുന്നു...",
+    "locationSharing": "നിങ്ങളുടെ സ്ഥാനം പങ്കിടുന്നു"
+  },
+  "map": {
+    "title": "മാപ്പ് കാഴ്ച",
+    "noData": "പ്രദർശിപ്പിക്കാൻ കേസുകൾ ഇല്ല",
+    "zoomToFit": "ഫിറ്റ് ചെയ്യാൻ സൂം ചെയ്യുക",
+    "currentLocation": "നിലവിലെ സ്ഥാനം"
+  },
+  "settings": {
+    "title": "സെറ്റിംഗുകൾ",
+    "language": "ഭാഷ",
+    "notifications": "അറിയിപ്പുകൾ",
+    "privacyPolicy": "ഗോപ്യതാ നയം",
+    "termsOfService": "സേവന നിബന്ധനകൾ",
+    "about": "രക്ഷ AI എപ്പോ",
+    "version": "പതിപ്പ്"
+  }
+}

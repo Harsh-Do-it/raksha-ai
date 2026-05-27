@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "राक्षा एआई",
+    "subtitle": "स्मार्ट सड़क सुरक्षा प्रबंधन"
+  },
+  "navigation": {
+    "home": "होम",
+    "dashboard": "डैशबोर्ड",
+    "reportIssue": "समस्या रिपोर्ट करें",
+    "riskAlert": "जोखिम सतर्कता",
+    "sos": "एसओएस",
+    "legal": "कानूनी जानकारी"
+  },
+  "common": {
+    "submit": "जमा करें",
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफल",
+    "warning": "चेतावनी",
+    "language": "भाषा"
+  },
+  "reports": {
+    "title": "समस्या रिपोर्ट करें",
+    "description": "सड़क की समस्याओं, गड्ढों और खतरों की रिपोर्ट करें",
+    "uploadImage": "छवि अपलोड करें",
+    "selectLocation": "स्थान चुनें",
+    "severity": "गंभीरता स्तर",
+    "severityHigh": "उच्च",
+    "severityMedium": "मध्यम",
+    "severityLow": "कम",
+    "issueType": "समस्या का प्रकार",
+    "pothole": "गड्ढा",
+    "accident": "दुर्घटना प्रवण क्षेत्र",
+    "flooding": "बाढ़",
+    "roadDamage": "सड़क को नुकसान",
+    "submit": "रिपोर्ट जमा करें",
+    "successMessage": "रिपोर्ट सफलतापूर्वक जमा की गई",
+    "errorMessage": "रिपोर्ट जमा करने में विफल"
+  },
+  "notifications": {
+    "title": "सूचनाएं",
+    "warnings": "चेतावनियां",
+    "alerts": "सतर्कताएं",
+    "highSeverity": "उच्च गंभीरता सतर्कता",
+    "newReportNearby": "पास में नई रिपोर्ट",
+    "roadConditionChanged": "सड़क की स्थिति बदल गई",
+    "emergencySOS": "आपातकालीन एसओएस सतर्कता",
+    "markAsRead": "पढ़ा हुआ चिह्नित करें",
+    "clearAll": "सभी साफ करें"
+  },
+  "dashboard": {
+    "title": "डैशबोर्ड",
+    "overview": "अवलोकन",
+    "activeAlerts": "सक्रिय सतर्कताएं",
+    "reportsToday": "आज की रिपोर्ट",
+    "severityDistribution": "गंभीरता वितरण",
+    "hotspots": "दुर्घटना हॉटस्पॉट",
+    "recentReports": "हाल की रिपोर्ट",
+    "preferences": "वरीयताएं",
+    "minSeverity": "न्यूनतम गंभीरता",
+    "zones": "क्षेत्र",
+    "pushNotifications": "पुश सूचनाएं",
+    "smsNotifications": "एसएमएस सूचनाएं"
+  },
+  "sos": {
+    "title": "आपातकालीन एसओएस",
+    "description": "आपातकाल की स्थिति में तुरंत मदद प्राप्त करें",
+    "buttonLabel": "आपातकाल के लिए दबाएं",
+    "nearbyHospitals": "पास के अस्पताल",
+    "emergencyServices": "आपातकालीन सेवाएं",
+    "contactingServices": "आपातकालीन सेवाओं से संपर्क किया जा रहा है...",
+    "locationSharing": "आपका स्थान साझा किया जा रहा है"
+  },
+  "map": {
+    "title": "मानचित्र दृश्य",
+    "noData": "प्रदर्शित करने के लिए कोई घटनाएं नहीं",
+    "zoomToFit": "फिट करने के लिए ज़ूम करें",
+    "currentLocation": "वर्तमान स्थान"
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "language": "भाषा",
+    "notifications": "सूचनाएं",
+    "privacyPolicy": "गोपनीयता नीति",
+    "termsOfService": "सेवा की शर्तें",
+    "about": "राक्षा एआई के बारे में",
+    "version": "संस्करण"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "ರಕ್ಷ AI",
+    "subtitle": "ಸ್ಮಾರ್ಟ ರಸ್ತೆ ಸುರಕ್ಷತೆ ನಿರ್ವಹಣೆ"
+  },
+  "navigation": {
+    "home": "ಮುಖಪುಟ",
+    "dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+    "reportIssue": "ಸಮಸ್ಯೆ ವರದಿ ಮಾಡಿ",
+    "riskAlert": "ಅಪಾಯ ಎಚ್ಚರಿಕೆ",
+    "sos": "SOS",
+    "legal": "ಕಾನೂನು ಮಾಹಿತಿ"
+  },
+  "common": {
+    "submit": "ಸಲ್ಲಿಸಿ",
+    "cancel": "ರದ್ದುಮಾಡಿ",
+    "save": "ಉಳಿಸಿ",
+    "delete": "ಅಳಿಸಿ",
+    "edit": "ತಿದ್ದುವುದು",
+    "loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ...",
+    "error": "ದೋಷ",
+    "success": "ಯಶಸ್ಸು",
+    "warning": "ಎಚ್ಚರಿಕೆ",
+    "language": "ಭಾಷೆ"
+  },
+  "reports": {
+    "title": "ಸಮಸ್ಯೆ ವರದಿ ಮಾಡಿ",
+    "description": "ರಸ್ತೆ ಸಮಸ್ಯೆಗಳು, ಗುಂಡಿಗಳು ಮತ್ತು ಅಪಾಯಗಳನ್ನು ವರದಿ ಮಾಡಿ",
+    "uploadImage": "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
+    "selectLocation": "ಸ್ಥಳ ಆಯ್ಕೆ ಮಾಡಿ",
+    "severity": "ತೀವ್ರತೆಯ ಮಟ್ಟ",
+    "severityHigh": "ಹೆಚ್ಚು",
+    "severityMedium": "ಮಧ್ಯಮ",
+    "severityLow": "ಕಡಿಮೆ",
+    "issueType": "ಸಮಸ್ಯೆಯ ಪ್ರಕಾರ",
+    "pothole": "ಗುಂಡಿ",
+    "accident": "ಅಪಘಾತ-ಪ್ರವಣ ಪ್ರದೇಶ",
+    "flooding": "ಹೊಳೆ",
+    "roadDamage": "ರಸ್ತೆ ಹಾನಿ",
+    "submit": "ವರದಿ ಸಲ್ಲಿಸಿ",
+    "successMessage": "ವರದಿ ಯಶಸ್ವಿಯಾಗಿ ಸಲ್ಲಿಸಲಾಗಿದೆ",
+    "errorMessage": "ವರದಿ ಸಲ್ಲಿಸಲು ವಿಫಲವಾಗಿದೆ"
+  },
+  "notifications": {
+    "title": "ಅಧಿಸೂಚನೆಗಳು",
+    "warnings": "ಎಚ್ಚರಿಕೆಗಳು",
+    "alerts": "ಎಚ್ಚರಿಕೆಗಳು",
+    "highSeverity": "ಹೆಚ್ಚಿನ ತೀವ್ರತೆಯ ಎಚ್ಚರಿಕೆ",
+    "newReportNearby": "ಹತ್ತಿರ ಹೊಸ ವರದಿ",
+    "roadConditionChanged": "ರಸ್ತೆ ಸ್ಥಿತಿ ಬದಲಾಯಿತು",
+    "emergencySOS": "ತುರ್ತು SOS ಎಚ್ಚರಿಕೆ",
+    "markAsRead": "ಓದಿದ್ದೆ ಎಂದು ಗುರುತಿಸಿ",
+    "clearAll": "ಎಲ್ಲವನ್ನು ತೆರವುಗೊಳಿಸಿ"
+  },
+  "dashboard": {
+    "title": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+    "overview": "ಅವಲೋಕನ",
+    "activeAlerts": "ಸಕ್ರಿಯ ಎಚ್ಚರಿಕೆಗಳು",
+    "reportsToday": "ಇಂದಿನ ವರದಿಗಳು",
+    "severityDistribution": "ತೀವ್ರತೆಯ ವಿತರಣೆ",
+    "hotspots": "ಅಪಘಾತ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು",
+    "recentReports": "ಇತ್ತೀಚೆಯ ವರದಿಗಳು",
+    "preferences": "ಆದ್ಯತೆಗಳು",
+    "minSeverity": "ಕನಿಷ್ಠ ತೀವ್ರತೆ",
+    "zones": "ವಲಯಗಳು",
+    "pushNotifications": "ತಳ್ಳು ಅಧಿಸೂಚನೆಗಳು",
+    "smsNotifications": "SMS ಅಧಿಸೂಚನೆಗಳು"
+  },
+  "sos": {
+    "title": "ತುರ್ತು SOS",
+    "description": "ತುರ್ತು ಸಂದರ್ಭದಲ್ಲಿ ತಕ್ಷಣ ಸಹಾಯ ಪಡೆಯಿರಿ",
+    "buttonLabel": "ತುರ್ತಿಗಾಗಿ ಒತ್ತಿರಿ",
+    "nearbyHospitals": "ಹತ್ತಿರದ ಆಸ್ಪತ್ರೆಗಳು",
+    "emergencyServices": "ತುರ್ತು ಸೇವೆಗಳು",
+    "contactingServices": "ತುರ್ತು ಸೇವೆಗಳನ್ನು ಸಂಪರ್ಕಿಸುತ್ತಿದೆ...",
+    "locationSharing": "ನಿಮ್ಮ ಸ್ಥಳ ಹಂಚಿಕೆ ಮಾಡಲಾಗುತ್ತಿದೆ"
+  },
+  "map": {
+    "title": "ನಕ್ಷೆ ನೋಟ",
+    "noData": "ಪ್ರದರ್ಶನಕ್ಕೆ ಯಾವುದೇ ಘಟನೆಗಳಿಲ್ಲ",
+    "zoomToFit": "ಸರಿಹೊಂದಿಸುವ ಮೂಲಕ ಜೂಮ್ ಮಾಡಿ",
+    "currentLocation": "ಪ್ರಸ್ತುತ ಸ್ಥಳ"
+  },
+  "settings": {
+    "title": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "language": "ಭಾಷೆ",
+    "notifications": "ಅಧಿಸೂಚನೆಗಳು",
+    "privacyPolicy": "ಗೋಪ್ಯತೆ ನೀತಿ",
+    "termsOfService": "ಸೇವೆಯ ನಿಯಮಗಳು",
+    "about": "ರಕ್ಷ AI ಸಂಬಂಧೆ",
+    "version": "ಆವೃತ್ತಿ"
+  }
+}
