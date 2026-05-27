@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "i18next";
+import LanguageSelector from "../components/LanguageSelector";
 
 /* ─────────────────────────────────────────────────────────────
    Home.jsx — Raksha AI landing page
@@ -163,6 +165,7 @@ function Navbar({ navigate }) {
             {l.label}
           </button>
         ))}
+        <LanguageSelector />
         <button onClick={() => navigate("/sos")} style={{
           padding: "7px 18px", borderRadius: 8,
           background: "#dc2626", border: "none",
