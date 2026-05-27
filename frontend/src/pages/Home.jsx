@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "i18next";
 import LanguageSelector from "../components/LanguageSelector";
 
 /* ─────────────────────────────────────────────────────────────
