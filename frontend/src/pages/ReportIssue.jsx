@@ -1,8 +1,8 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ImageUploader from "../components/RoadIssue/ImageUploader";
 import DetectionResult from "../components/RoadIssue/DetectionResult";
-
+import { submitIssue, uploadAndDetect } from "../services/roadService";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "../components/LanguageSelector";
 
@@ -75,31 +75,78 @@ export default function ReportIssue() {
   const [preview, setPreview] = useState(null);
   const [detecting, setDetecting] = useState(false);
   const [result, setResult] = useState(null);
+  const [savedFilename, setSavedFilename] = useState(null); // server-side image filename
   const [issueType, setIssueType] = useState(null);
   const [severity, setSeverity] = useState(null);
   const [road, setRoad] = useState("");
   const [area, setArea] = useState("");
   const [desc, setDesc] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [reportId, setReportId] = useState("");
 
-  function handleFile(file) {
+  async function handleFile(file) {
     if (!file || !file.type.startsWith("image/")) return;
-
     setResult(null);
+    setSavedFilename(null);
     setDetecting(true);
-
-    setTimeout(() => {
+    try {
+      // Try real backend first; fall back to simulation if unavailable
+      const det = await uploadAndDetect(file);
+      setResult({
+        labelKey: "reportIssuePage.issueTypes.pothole", // for i18n compat
+        label: det.label,
+        confidence: det.confidence,
+        severity: det.severity,
+        description: det.description,
+        descriptionKey: "reportIssuePage.simulated.pothole",
+      });
+      if (det.savedFilename) setSavedFilename(det.savedFilename);
+      const key = det.label?.toLowerCase() || "";
+      setIssueType(
+        ISSUE_TYPES.find(type =>
+          key.includes(type.key) || key.includes(type.label?.toLowerCase())
+        ) || ISSUE_TYPES[0]
+      );
+      setSeverity(det.severity || "medium");
+    } catch {
+      // Fallback to simulation if backend unavailable
       const det = simulateDetection(file.name);
       setResult({ ...det, label: t(det.labelKey), description: t(det.descriptionKey) });
-      setIssueType(ISSUE_TYPES.find(type => type.key === (det.labelKey.includes("water") ? "water" : det.labelKey.includes("pothole") ? "pothole" : "damage")) || ISSUE_TYPES[0]);
+      setIssueType(
+        ISSUE_TYPES.find(type =>
+          type.key === (det.labelKey.includes("water") ? "water" : det.labelKey.includes("pothole") ? "pothole" : "damage")
+        ) || ISSUE_TYPES[0]
+      );
       setSeverity(det.severity);
+    } finally {
       setDetecting(false);
-    }, 2000);
+    }
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!road.trim()) return;
-    setSubmitted(true);
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const data = await submitIssue({
+        type: issueType?.label || "Other",
+        severity: severity || "medium",
+        road: road.trim(),
+        area: area.trim(),
+        description: desc.trim(),
+        aiLabel: result?.label || null,
+        aiConfidence: result?.confidence || null,
+        imageFilename: savedFilename || null,
+      });
+      setReportId(data.issueId || "");
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(err.message || "Failed to submit report. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const sevConf = SEVERITY_LEVELS.find(s => s.key === severity) || SEVERITY_LEVELS[2];
@@ -114,11 +161,16 @@ export default function ReportIssue() {
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round"><path d="M20 6 9 17l-5-5"/></svg>
             </div>
             <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:32,letterSpacing:3,color:"#22c55e",marginBottom:8 }}>{t("reportIssuePage.submittedTitle")}</div>
+            {reportId && (
+              <div style={{ fontFamily:"'DM Mono',monospace",fontSize:11,color:"rgba(255,255,255,0.25)",marginBottom:8,letterSpacing:1 }}>
+                Report ID: {reportId}
+              </div>
+            )}
             <div style={{ fontSize:13,color:"rgba(255,255,255,0.4)",lineHeight:1.7,marginBottom:28 }}>
               {t("reportIssuePage.submittedMessage")}
             </div>
             <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
-              <button onClick={() => { setSubmitted(false); setPreview(null); setResult(null); setRoad(""); setArea(""); setDesc(""); }}
+              <button onClick={() => { setSubmitted(false); setPreview(null); setResult(null); setRoad(""); setArea(""); setDesc(""); setReportId(""); }}
                 style={{ padding:"10px 22px",borderRadius:8,border:"1px solid rgba(255,255,255,0.1)",background:"transparent",color:"rgba(255,255,255,0.6)",fontSize:13,cursor:"pointer",fontFamily:"'DM Sans',sans-serif" }}>
                 {t("reportIssuePage.reportAnother")}
               </button>
@@ -233,9 +285,14 @@ export default function ReportIssue() {
                 value={desc} onChange={e => setDesc(e.target.value)} />
             </div>
 
-            <button onClick={handleSubmit} disabled={!road.trim()} style={{
+            {submitError && (
+              <div style={{ padding:"10px 14px",borderRadius:8,background:"rgba(220,38,38,0.08)",border:"1px solid rgba(220,38,38,0.25)",color:"#f87171",fontSize:12.5,fontFamily:"'DM Sans',sans-serif",marginBottom:6 }}>
+                {submitError}
+              </div>
+            )}
+            <button onClick={handleSubmit} disabled={!road.trim() || submitting} style={{
               width:"100%", padding:"13px", borderRadius:10,
-              border:"none", cursor: road.trim() ? "pointer" : "not-allowed",
+              border:"none", cursor: (road.trim() && !submitting) ? "pointer" : "not-allowed",
               background: road.trim() ? "#dc2626" : "rgba(255,255,255,0.06)",
               color: road.trim() ? "white" : "rgba(255,255,255,0.2)",
               fontSize:14, fontWeight:700, fontFamily:"'DM Sans',sans-serif",
@@ -243,7 +300,7 @@ export default function ReportIssue() {
               boxShadow: road.trim() ? "0 4px 20px rgba(220,38,38,0.35)" : "none",
               transition:"all 0.18s",
             }}>
-              {t("reportIssuePage.submit")}
+              {submitting ? "Submitting…" : t("reportIssuePage.submit")}
             </button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, Optional, Tuple
 
-_FIRBASE_APP: Optional[Any] = None
+_FIREBASE_APP: Optional[Any] = None
 
 
 def _load_firebase_modules() -> Tuple[Optional[Any], Optional[Any], Optional[Any], Optional[Any]]:
@@ -40,7 +40,7 @@ def initialize_firebase() -> Optional[Any]:
     if firebase_admin is None or initialize_app is None:
         return None
 
-    cached_app = globals().get("_FIRBASE_APP")
+    cached_app = globals().get("_FIREBASE_APP")
     if cached_app is not None:
         return cached_app
 

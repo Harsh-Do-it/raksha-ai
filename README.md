@@ -1,194 +1,167 @@
-﻿# Raksha AI – Intelligent Road Safety Ecosystem
+<div align="center">
 
-> Preventing accidents. Saving lives. Empowering citizens.
+# 🛡️ RAKSHA AI
 
-## 🌍 Problem Statement
+**Intelligent Road Safety Ecosystem**
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge&logo=github" alt="Status" />
+  <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge&logo=semver" alt="Version" />
+  <img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="License" />
+  <img src="https://img.shields.io/badge/Tech-React_|_Flask_|_AI-black?style=for-the-badge&logo=react" alt="Tech" />
+</p>
+
+> *"Preventing accidents. Saving lives. Empowering citizens."*
+
+[Features](#-key-features) • [Architecture](#-architecture) • [Installation](#-installation) • [API & Endpoints](#-api-endpoints)
+
+</div>
+
+---
+
+## 🌍 The Problem
 
 India records one of the highest numbers of road accidents globally. The main challenges are:
 
-- Delayed emergency response.
-- Poor road infrastructure monitoring.
-- Lack of real-time safety insights.
-- Limited awareness of traffic laws and risky zones.
+| 🚑 **Delayed Response** | 🚧 **Poor Infrastructure** | ⚠️ **Lack of Insights** | 🛑 **Low Awareness** |
+| :--- | :--- | :--- | :--- |
+| Golden hour is often missed due to delayed emergency response. | Inadequate monitoring of potholes, damaged roads, and missing signs. | No real-time data to warn drivers of upcoming high-risk zones. | Citizens often lack awareness of traffic laws and dangerous intersections. |
 
-## 💡 Our Solution
+---
 
-Raksha AI is a unified road safety platform designed to:
+## 💡 The Million-Dollar Solution
 
-- Respond instantly during accidents.
-- Detect and report road issues using AI.
-- Visualize accident-prone zones.
-- Predict and warn about high-risk areas.
+**Raksha AI** is a unified, intelligent road safety platform engineered for impact. We combine crowdsourced reporting, AI-driven detection, and instant emergency protocols into a seamless, high-performance ecosystem.
 
-## 🔥 Current Feature Status
+<details>
+<summary><b>✨ Click to see how Raksha AI solves these problems</b></summary>
+<br/>
+<ul>
+  <li><b>Instant SOS:</b> Bypasses delays by directly notifying dispatch with live location.</li>
+  <li><b>AI Detection:</b> Users snap a photo; our AI classifies the road damage and severity instantly.</li>
+  <li><b>Live Dashboard:</b> A tactical map showing active hotspots, allowing authorities to prioritize repairs.</li>
+</ul>
+</details>
+
+---
+
+## 🔥 Key Features
 
 ### 🚨 Smart SOS System
-
-- Simulated emergency alert generation.
-- Live location fallback support.
-- Emergency contacts and incident log output.
-- Backend endpoint available for dispatch.
+Generates emergency alerts with one tap. Features live location fallback support, emergency contact notification, and backend dispatch integration.
 
 ### 🛣️ AI Road Issue Detection
+Upload a photo of a road hazard. Our AI engine validates, classifies the issue (e.g., Pothole, Waterlogging), scores the confidence, and assigns a severity rating asynchronously.
 
-- Image upload and validation.
-- Road issue classification with confidence and severity.
-- Detection job flow for asynchronous processing.
-
-### 📊 Interactive Dashboard
-
-- Summary, hotspots, recent issues, and map payload endpoints.
-- Static landing page prototype for product storytelling.
+### 📊 Tactical Live Dashboard
+A dark-mode, command-center style dashboard providing real-time summaries, active hotspot mapping, and a live feed of recent issues reported by citizens.
 
 ### ⚠️ Accident Risk Alert
+Analyzes route coordinates and generates a risk score to warn users of high-risk areas before they arrive.
 
-- Risk score and coordinate-based prediction endpoints.
-- Route profile and alert generation support.
+---
 
-### ⚖️ Legal Awareness Module
+## ⚙️ Tech Stack
 
-- Prototype UI remains in progress.
-- Future scope for location-aware traffic law guidance.
+<div align="center">
 
-## 🏗️ System Architecture
+| Layer | Technologies |
+| :---: | :--- |
+| **Frontend** | React, Vite, React Router, TailwindCSS/Custom CSS |
+| **Backend** | Python, Flask, REST API |
+| **AI/ML** | Lightweight Object Detection Models |
+| **Infrastructure** | Docker, Docker Compose |
 
-```text
-User (Web App)
-     ↓
-Frontend (static landing page + React-ready source folders)
-     ↓
-Backend (Flask)
-     ↓
-AI / ML Models
-     ↓
-Firebase / Maps integrations (planned and partially wired)
+</div>
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+graph TD
+    User([👤 User / Citizen]) -->|Reports Issue & SOS| WebApp
+    WebApp[💻 Frontend React App] -->|REST API| API[⚙️ Flask Backend]
+    API -->|Images| AI[🧠 AI Detection Engine]
+    API -->|Data| DB[(Database / JSON)]
+    API -->|Live Updates| Admin([👮 Admin Dashboard])
 ```
 
-## 🛠️ Tech Stack
+---
 
-### 💻 Frontend
+## 🚀 Installation & Setup
 
-- HTML/CSS landing page prototype
-- JSX source folders under `frontend/src/`
+Get Raksha AI up and running on your local machine in minutes.
 
-### ⚙️ Backend
-
-- Flask
-
-### 🧠 AI / ML
-
-- Lightweight mock AI models for potholes and road issues
-- Training scripts and demos in `ai-models/`
-
-### 🗄️ Database / Services
-
-- Firebase status support in backend
-- Google Maps helpers for nearest hospitals and reverse geocoding
-
-## 📂 Project Structure
-
-```text
-raksha-ai/
-├── assets/                # Demo assets and media
-├── ai-models/             # AI / ML scripts and demo models
-├── backend/               # Flask backend
-│   ├── config.py
-│   ├── main.py
-│   ├── models/
-│   ├── routers/
-│   ├── services/
-│   └── uploads/
-├── docs/                  # Documentation
-├── frontend/              # Frontend prototype and source folders
-│   ├── index.html         # Current root HTML entry point
-│   ├── public/
-│   └── src/
-├── tests/                 # Backend validation tests
-├── .env.example
-├── .gitignore
-├── docker-compose.yml
-├── LICENSE
-├── README.md
-└── CONTRIBUTING.md
-```
-
-## ⚙️ Setup
-
-### 1. Clone the repository
-
+### 1️⃣ Clone the Repository
 ```bash
 git clone https://github.com/your-username/raksha-ai.git
 cd raksha-ai
 ```
 
-### 2. Configure environment variables
-
+### 2️⃣ Environment Configuration
 ```bash
-copy .env.example .env
+cp .env.example .env
+```
+*Edit `.env` and fill in your API keys (Google Maps, etc.) and admin credentials.*
+
+### 3️⃣ Launch the Ecosystem
+
+**Using Docker (Recommended):**
+```bash
+docker-compose up --build
 ```
 
-Fill in the required API keys and service configuration in `.env`.
+**Manual Setup (Frontend + Backend):**
+<details>
+<summary><b>Click for manual instructions</b></summary>
+<br/>
 
-### 3. Run the project locally
-
-#### Option A: Docker Compose
-
+**Backend:**
 ```bash
-docker compose up --build
-```
-
-#### Option B: Backend only
-
-```bash
+cd backend
 python -m venv .venv
-.venv\Scripts\activate
-pip install -r backend/Requirements.txt
-python backend/main.py
+source .venv/bin/activate  # (or .venv\Scripts\activate on Windows)
+pip install -r Requirements.txt
+python main.py
 ```
 
-### 4. Frontend preview
-
-The current frontend is a static prototype. Open `frontend/public/index.html` in a browser or serve `frontend/` through your preferred local web server.
-
-## 🧪 Validation
-
-The backend exposes the following tested routes:
-
-- `/health`
-- `/risk/score`
-- `/dashboard/summary`
-- `/sos/activate`
-- `/roads/detect`
-
-Run the automated validation suite:
-
+**Frontend:**
 ```bash
-python -m unittest discover tests
+cd frontend
+npm install
+npm run dev
 ```
+</details>
 
-If you want to test the backend manually after starting it, use the Flask test client or a tool like Postman.
+---
 
-## 🚀 Future Scope
+## 📡 API Endpoints
 
-- Real-time IoT vehicle sensor integration.
-- Direct hospital and ambulance coordination.
-- Advanced ML-based accident prediction.
-- AI voice assistant for emergency support.
-- Smart traffic system integration.
+The backend exposes a rich REST API. Here are some of the key endpoints:
 
-## 🧠 Innovation Highlights
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/health` | `GET` | Health check and system status |
+| `/auth/login` | `POST` | Authenticate user |
+| `/roads/issues` | `POST` | Submit a new road issue with AI data |
+| `/roads/detect` | `POST` | Upload an image for AI detection |
+| `/dashboard/summary` | `GET` | Fetch live stats and hotspots |
+| `/sos/activate` | `POST` | Trigger an emergency SOS |
 
-- Combines emergency response, infrastructure monitoring, and AI prediction.
-- Designed specifically for Indian road conditions.
-- Scalable into a national-level safety platform.
+*Run `python -m unittest discover tests` in the backend directory to execute the automated validation suite.*
 
-## 🎯 Primary Use Cases
+---
 
-- Daily commuters
-- Emergency services
-- Government authorities
-- Smart city initiatives
+## 🧠 Future Scope
 
-## 👤 Maintainer
+- **Real-time IoT Integration:** Direct vehicle sensor telemetry.
+- **Smart City Grid:** Integration with government traffic management systems.
+- **Advanced Predictive ML:** Predicting accidents based on weather, traffic, and historical data.
 
-- Saket Pathak
+---
+
+<div align="center">
+  <b>Built for safety. Designed for impact.</b><br><br>
+  <i>Maintainer: Saket Pathak</i>
+</div>

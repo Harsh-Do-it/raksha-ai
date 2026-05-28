@@ -23,3 +23,10 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Build output
+dist/
+frontend/dist/
+
+# Local env overrides
+*.env.local

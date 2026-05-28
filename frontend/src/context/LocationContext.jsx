@@ -32,7 +32,6 @@ import {
   useCallback,
 } from "react";
 import { reverseGeocode } from "../services/mapsService";
-import i18n from "../i18n/config";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const MOVEMENT_THRESHOLD_M   = 15;    // ignore GPS updates < 15 m of movement
@@ -280,9 +279,12 @@ export function useLocation() {
 
 // ── Geolocation error helper ──────────────────────────────────────────────────
 function friendlyGeoError(err) {
-  const keys = { 1: "denied", 2: "unavailable", 3: "timeout" };
-  const key = keys[err.code] || "unknown";
-  return i18n.t(`locationErrors.${key}`);
+  switch (err.code) {
+    case 1: return "Location access denied. Please enable GPS in your browser settings.";
+    case 2: return "Position unavailable. Check your GPS signal.";
+    case 3: return "Location request timed out. Please try again.";
+    default: return "An unknown location error occurred.";
+  }
 }
 
 export default LocationContext;

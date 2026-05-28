@@ -1,7 +1,8 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import LanguageSelector from "../components/LanguageSelector";
 import { useTranslation } from "react-i18next";
+import { isAuthenticated, isAdmin, getCurrentUser, logout } from "../services/authService";
 
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Home.jsx â€” Raksha AI landing page
@@ -114,12 +115,20 @@ function Navbar({ navigate }) {
   const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen]  = useState(false);
+  const loggedIn = isAuthenticated();
+  const admin = isAdmin();
+  const user = getCurrentUser();
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", fn, { passive: true });
     return () => window.removeEventListener("scroll", fn);
   }, []);
+
+  async function handleLogout() {
+    await logout();
+    window.location.reload();
+  }
 
   return (
     <nav style={{
@@ -167,6 +176,35 @@ function Navbar({ navigate }) {
           </button>
         ))}
         <LanguageSelector />
+
+        {/* Auth buttons */}
+        {loggedIn ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            {admin && (
+              <button onClick={() => navigate("/admin")} style={{
+                padding: "6px 14px", borderRadius: 7,
+                background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)",
+                color: "#a78bfa", fontSize: 11, fontWeight: 600,
+                cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+                letterSpacing: "0.3px",
+              }}>🔐 Admin</button>
+            )}
+            <button onClick={handleLogout} style={{
+              padding: "6px 12px", borderRadius: 7,
+              background: "transparent", border: "1px solid rgba(255,255,255,0.1)",
+              color: "rgba(255,255,255,0.4)", fontSize: 11,
+              cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+            }}>Logout</button>
+          </div>
+        ) : (
+          <button onClick={() => navigate("/login")} style={{
+            padding: "6px 16px", borderRadius: 7,
+            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+            color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 500,
+            cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+          }}>Login</button>
+        )}
+
         <button onClick={() => navigate("/sos")} style={{
           padding: "7px 18px", borderRadius: 8,
           background: "#dc2626", border: "none",

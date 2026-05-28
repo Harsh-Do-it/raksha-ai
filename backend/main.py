@@ -6,7 +6,8 @@ from pathlib import Path
 from threading import Event
 from typing import Any, Dict, List, Optional
 
-from flask import Flask, Response, jsonify, request
+from flask import Flask, Response, jsonify, request, send_from_directory
+from flask_cors import CORS
 
 sys.path.append(str(Path(__file__).resolve().parent))
 
@@ -17,7 +18,14 @@ from models.SosModel import RakshaAISOS
 from services.ai_bridge import RakshaAIBridge
 from services.firebase_service import get_firebase_status
 from services.maps_service import nearby_hospitals, reverse_geocode
-from services.localization_service import LocalizationService, get_user_language
+from services.auth_service import (
+    register_user, login_user, login_admin,
+    get_current_user, is_admin, logout_token,
+)
+from services.reports_service import (
+    create_report, get_reports, get_report_by_id,
+    update_report_status, delete_report, get_stats,
+)
 
 
 def create_app() -> Flask:
@@ -26,6 +34,7 @@ def create_app() -> Flask:
         SECRET_KEY=Config.SECRET_KEY,
         MAX_CONTENT_LENGTH=Config.MAX_CONTENT_LENGTH,
     )
+    CORS(app, resources={r"/*": {"origins": "*"}})
     Config.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     return app
 
@@ -37,6 +46,7 @@ road_model = RakshaRoadModel(upload_dir=Config.UPLOAD_DIR)
 ai_bridge = RakshaAIBridge(upload_dir=Config.UPLOAD_DIR, model=road_model)
 sos_model = RakshaAISOS()
 
+# In-memory risk alerts (non-critical to persist)
 RISK_ALERTS: List[Dict[str, Any]] = []
 PREFERENCES = {
     "minSeverity": "high",
@@ -47,39 +57,8 @@ PREFERENCES = {
 BASE_HOURLY_DISTRIBUTION = [14, 8, 5, 4, 6, 10, 18, 32, 47, 38, 29, 24, 21, 19, 23, 28, 35, 41, 52, 61, 48, 37, 29, 20]
 SEVERITY_ORDER = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
-DEFAULT_SUMMARY = {
-    "stats": [
-        {"label": "Active Incidents", "value": 14, "change": "+3 since yesterday", "color": "#dc2626"},
-        {"label": "Issues Reported", "value": 2847, "change": "+12 today", "color": "#f97316"},
-        {"label": "SOS Activations", "value": 341, "change": "This month", "color": "#22c55e"},
-        {"label": "Resolved Issues", "value": "89%", "change": "Resolution rate", "color": "#3b82f6"},
-    ],
-    "hotspots": [
-        {"name": "NH-48 Ring Road", "count": 142},
-        {"name": "Mathura Road Flyover", "count": 118},
-        {"name": "Outer Ring Road N", "count": 97},
-        {"name": "DND Flyway", "count": 83},
-        {"name": "Mehrauli-Gurgaon Rd", "count": 71},
-    ],
-    "recentIssues": [
-        {"id": 1, "type": "Pothole", "severity": "critical", "road": "NH-48, KM 14", "area": "Mahipalpur", "reportedAt": "18 min ago", "status": "verified"},
-        {"id": 2, "type": "Waterlogging", "severity": "high", "road": "Outer Ring Road", "area": "Nangloi", "reportedAt": "1 hr ago", "status": "in-progress"},
-        {"id": 3, "type": "Damaged Road", "severity": "high", "road": "Mathura Road", "area": "Badarpur", "reportedAt": "3 hrs ago", "status": "pending"},
-        {"id": 4, "type": "Broken Divider", "severity": "medium", "road": "Rohini Sec-3", "area": "Rohini", "reportedAt": "5 hrs ago", "status": "pending"},
-        {"id": 5, "type": "Missing Sign", "severity": "medium", "road": "DND Entry", "area": "Noida Link", "reportedAt": "8 hrs ago", "status": "verified"},
-    ],
-    "map": {
-        "mode": "placeholder",
-        "markers": [
-            {"label": "High Risk", "top": "35%", "left": "28%", "color": "#dc2626"},
-            {"label": "High Risk", "top": "55%", "left": "55%", "color": "#f97316"},
-            {"label": "Critical", "top": "25%", "left": "65%", "color": "#dc2626"},
-            {"label": "Medium", "top": "65%", "left": "35%", "color": "#eab308"},
-            {"label": "Low Risk", "top": "45%", "left": "75%", "color": "#22c55e"},
-        ],
-    },
-}
 
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
@@ -121,12 +100,28 @@ def _append_alert(zone: str, score: int, reason: Optional[str] = None) -> Dict[s
     return alert
 
 
+def _get_auth_user():
+    """Extract current user from Authorization header."""
+    return get_current_user(request.headers.get("Authorization"))
+
+
+def _require_admin():
+    """Return (user, error_response) tuple. error_response is None if OK."""
+    auth = request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer "):
+        return None, (jsonify({"success": False, "error": "Authentication required."}), 401)
+    token = auth[7:]
+    if not is_admin(token):
+        return None, (jsonify({"success": False, "error": "Admin access required."}), 403)
+    user = get_current_user(auth)
+    return user, None
+
+
+# ── Root & Health ─────────────────────────────────────────────────────────────
+
 @app.route("/")
 def home():
-    return jsonify({
-        "message": "Raksha AI backend running",
-        "version": "1.0",
-    })
+    return jsonify({"message": "Raksha AI backend running", "version": "2.0"})
 
 
 @app.route("/health")
@@ -137,6 +132,223 @@ def health_check():
         "firebase": get_firebase_status(),
     })
 
+
+# ── Auth Routes ───────────────────────────────────────────────────────────────
+
+@app.route("/auth/register", methods=["POST"])
+def auth_register():
+    payload = _parse_payload()
+    result = register_user(
+        name=payload.get("name", ""),
+        email=payload.get("email", ""),
+        password=payload.get("password", ""),
+    )
+    if not result.get("success"):
+        return jsonify(result), 400
+    return jsonify(result), 201
+
+
+@app.route("/auth/login", methods=["POST"])
+def auth_login():
+    payload = _parse_payload()
+    result = login_user(
+        email=payload.get("email", ""),
+        password=payload.get("password", ""),
+    )
+    if not result.get("success"):
+        return jsonify(result), 401
+    return jsonify(result)
+
+
+@app.route("/auth/admin/login", methods=["POST"])
+def auth_admin_login():
+    payload = _parse_payload()
+    result = login_admin(
+        username=payload.get("username", ""),
+        password=payload.get("password", ""),
+    )
+    if not result.get("success"):
+        return jsonify(result), 401
+    return jsonify(result)
+
+
+@app.route("/auth/logout", methods=["POST"])
+def auth_logout():
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        logout_token(auth[7:])
+    return jsonify({"success": True})
+
+
+@app.route("/auth/me", methods=["GET"])
+def auth_me():
+    user = _get_auth_user()
+    if not user:
+        return jsonify({"success": False, "error": "Not authenticated"}), 401
+    return jsonify({"success": True, **user})
+
+
+# ── Road Issue Reports ─────────────────────────────────────────────────────────
+
+@app.route("/roads/issues", methods=["POST"])
+def submit_road_issue():
+    payload = _parse_payload()
+    issue_type = payload.get("type", "").strip()
+    severity = payload.get("severity", "medium").strip()
+    road = payload.get("road", "").strip()
+
+    if not issue_type:
+        return jsonify({"success": False, "error": "Issue type is required."}), 400
+    if not road:
+        return jsonify({"success": False, "error": "Road/location is required."}), 400
+
+    # Identify who is reporting
+    user = _get_auth_user()
+    reporter_name = user.get("name", "Anonymous") if user else "Anonymous"
+    reporter_id = user.get("user_id") if user else None
+
+    report = create_report(
+        issue_type=issue_type,
+        severity=severity,
+        road=road,
+        area=payload.get("area", ""),
+        description=payload.get("description", ""),
+        ai_label=payload.get("ai_label"),
+        ai_confidence=payload.get("ai_confidence"),
+        image_filename=payload.get("image_filename"),
+        lat=_coerce_float(payload.get("lat")),
+        lng=_coerce_float(payload.get("lng")),
+        reporter_name=reporter_name,
+        reporter_id=reporter_id,
+    )
+    return jsonify({"success": True, "report": report}), 201
+
+
+@app.route("/roads/issues", methods=["GET"])
+def list_road_issues():
+    status = request.args.get("status")
+    severity = request.args.get("severity")
+    issue_type = request.args.get("type")
+    limit = request.args.get("limit", default=20, type=int)
+    offset = request.args.get("offset", default=0, type=int)
+
+    result = get_reports(
+        status=status,
+        severity=severity,
+        issue_type=issue_type,
+        limit=limit,
+        offset=offset,
+    )
+    return jsonify(result)
+
+
+@app.route("/roads/issues/<report_id>", methods=["GET"])
+def get_road_issue(report_id: str):
+    report = get_report_by_id(report_id)
+    if not report:
+        return jsonify({"success": False, "error": "Report not found."}), 404
+    return jsonify(report)
+
+
+@app.route("/roads/issues/<report_id>", methods=["PATCH"])
+def update_road_issue(report_id: str):
+    _, err = _require_admin()
+    if err:
+        return err
+
+    payload = _parse_payload()
+    new_status = payload.get("status", "").strip()
+    admin_note = payload.get("admin_note", "").strip()
+
+    updated = update_report_status(report_id, new_status, admin_note)
+    if not updated:
+        return jsonify({"success": False, "error": "Report not found or invalid status."}), 404
+    return jsonify({"success": True, "report": updated})
+
+
+@app.route("/roads/issues/<report_id>", methods=["DELETE"])
+def delete_road_issue(report_id: str):
+    _, err = _require_admin()
+    if err:
+        return err
+
+    deleted = delete_report(report_id)
+    if not deleted:
+        return jsonify({"success": False, "error": "Report not found."}), 404
+    return jsonify({"success": True, "deleted": report_id})
+
+
+@app.route("/roads/issues/stats", methods=["GET"])
+def road_issues_stats():
+    return jsonify(get_stats())
+
+
+# ── Existing AI detection routes ───────────────────────────────────────────────
+
+@app.route("/roads/detect", methods=["POST"])
+def detect_road_issue():
+    file_storage = request.files.get("file")
+    if file_storage is None or file_storage.filename == "":
+        return jsonify({"success": False, "error": "No image file provided"}), 400
+
+    created = ai_bridge.create_detection_job(file_storage, filename=file_storage.filename)
+
+    if created.get("status") == "failed":
+        return jsonify(created), 400
+
+    if created.get("status") == "complete":
+        result = created["result"]
+        # Get the saved filename from the job
+        job = ai_bridge._get_job(created["job_id"])
+        saved_filename = job.get("filename") if job else None
+        return jsonify({
+            "jobId": created["job_id"],
+            "status": "complete",
+            "label": result["label"],
+            "confidence": result["confidence"],
+            "severity": result["severity"],
+            "description": result["description"],
+            "bbox": result.get("bbox"),
+            "savedFilename": saved_filename,
+        })
+
+    return jsonify({"jobId": created["job_id"], "status": created.get("status", "processing")})
+
+
+@app.route("/roads/detect/<job_id>", methods=["GET"])
+def road_detection_status(job_id: str):
+    current = ai_bridge.poll_detection_job(job_id)
+
+    if current.get("status") == "failed":
+        if current.get("error") == "Job not found":
+            return jsonify(current), 404
+        return jsonify(current), 400
+
+    if current.get("status") == "complete":
+        result = current["result"]
+        job = ai_bridge._get_job(job_id)
+        saved_filename = job.get("filename") if job else None
+        return jsonify({
+            "jobId": job_id,
+            "status": "complete",
+            "label": result["label"],
+            "confidence": result["confidence"],
+            "severity": result["severity"],
+            "description": result["description"],
+            "bbox": result.get("bbox"),
+            "savedFilename": saved_filename,
+        })
+
+    return jsonify({"jobId": job_id, "status": current.get("status", "processing")})
+
+
+@app.route("/uploads/<path:filename>", methods=["GET"])
+def serve_upload(filename: str):
+    """Serve uploaded images so admin panel can display them."""
+    return send_from_directory(Config.UPLOAD_DIR, filename)
+
+
+# ── Risk Routes ───────────────────────────────────────────────────────────────
 
 @app.route("/risk/score", methods=["POST"])
 def risk_score():
@@ -175,9 +387,9 @@ def risk_alerts():
 
     alerts = list(RISK_ALERTS)
     if status:
-        alerts = [alert for alert in alerts if alert.get("status") == status]
+        alerts = [a for a in alerts if a.get("status") == status]
     if min_severity:
-        alerts = [alert for alert in alerts if SEVERITY_ORDER.get(alert.get("severity", "low"), 3) <= SEVERITY_ORDER.get(min_severity, 3)]
+        alerts = [a for a in alerts if SEVERITY_ORDER.get(a.get("severity", "low"), 3) <= SEVERITY_ORDER.get(min_severity, 3)]
 
     alerts.sort(key=lambda item: SEVERITY_ORDER.get(item.get("severity", "low"), 3))
     return jsonify(alerts[:limit])
@@ -269,89 +481,90 @@ def risk_preferences():
     return jsonify(PREFERENCES)
 
 
+# ── Dashboard Routes ───────────────────────────────────────────────────────────
+
 @app.route("/dashboard/summary", methods=["GET"])
 def dashboard_summary():
-    days = request.args.get("days", default=30, type=int)
-    limit = request.args.get("limit", default=5, type=int)
+    stats = get_stats()
+    total = stats["total"]
+    resolved = stats["by_status"].get("resolved", 0)
+    resolution_rate = f"{round(resolved / total * 100)}%" if total else "N/A"
 
-    summary = {
-        **DEFAULT_SUMMARY,
-        "hotspots": DEFAULT_SUMMARY["hotspots"][:limit],
+    # Build hotspots from UNRESOLVED reports only
+    all_reports = get_reports(limit=500)["items"]
+    active_reports = [r for r in all_reports if r.get("status") != "resolved"]
+    area_counts: Dict[str, int] = {}
+    for r in active_reports:
+        area = r.get("road") or r.get("area") or "Unknown"
+        area_counts[area] = area_counts.get(area, 0) + 1
+
+    hotspots = sorted(
+        [{"name": k, "count": v} for k, v in area_counts.items()],
+        key=lambda x: x["count"], reverse=True
+    )[:5]
+
+    # Fallback hotspots if no active reports yet
+    if not hotspots:
+        hotspots = [
+            {"name": "NH-48 Ring Road", "count": 142},
+            {"name": "Mathura Road Flyover", "count": 118},
+            {"name": "Outer Ring Road N", "count": 97},
+            {"name": "DND Flyway", "count": 83},
+            {"name": "Mehrauli-Gurgaon Rd", "count": 71},
+        ]
+
+    recent_issues = get_reports(limit=5)["items"]
+
+    return jsonify({
+        "stats": [
+            {"label": "Active Incidents", "value": stats["by_status"].get("pending", 0) + stats["by_status"].get("verified", 0), "change": f"+{stats['by_status'].get('pending', 0)} pending", "color": "#dc2626"},
+            {"label": "Issues Reported", "value": total, "change": f"+{stats['by_status'].get('pending', 0)} today", "color": "#f97316"},
+            {"label": "SOS Activations", "value": 341, "change": "This month", "color": "#22c55e"},
+            {"label": "Resolved Issues", "value": resolution_rate, "change": "Resolution rate", "color": "#3b82f6"},
+        ],
+        "hotspots": hotspots,
+        "recentIssues": recent_issues,
         "generatedAt": _now_iso(),
-        "filters": {"days": days, "limit": limit},
-    }
-    return jsonify(summary)
+    })
 
 
 @app.route("/dashboard/recent-issues", methods=["GET"])
 def dashboard_recent_issues():
     limit = request.args.get("limit", default=5, type=int)
-    return jsonify(DEFAULT_SUMMARY["recentIssues"][:limit])
+    result = get_reports(limit=limit)
+    return jsonify(result["items"])
 
 
 @app.route("/dashboard/hotspots", methods=["GET"])
 def dashboard_hotspots():
+    """Return hotspot zones from ACTIVE (unresolved) reports only."""
     limit = request.args.get("limit", default=5, type=int)
-    return jsonify(DEFAULT_SUMMARY["hotspots"][:limit])
+    all_reports = get_reports(limit=500)["items"]
+    # Only count unresolved issues as active hotspots
+    active_reports = [r for r in all_reports if r.get("status") != "resolved"]
+    area_counts: Dict[str, int] = {}
+    for r in active_reports:
+        area = r.get("road") or r.get("area") or "Unknown"
+        area_counts[area] = area_counts.get(area, 0) + 1
+    hotspots = sorted(
+        [{"name": k, "count": v} for k, v in area_counts.items()],
+        key=lambda x: x["count"], reverse=True
+    )[:limit]
+    if not hotspots:
+        hotspots = [
+            {"name": "NH-48 Ring Road", "count": 142},
+            {"name": "Mathura Road Flyover", "count": 118},
+            {"name": "Outer Ring Road N", "count": 97},
+        ]
+    return jsonify(hotspots)
 
 
 @app.route("/dashboard/map", methods=["GET"])
 def dashboard_map():
-    return jsonify(DEFAULT_SUMMARY["map"])
+    return jsonify({"mode": "placeholder", "markers": []})
 
 
-@app.route("/roads/detect", methods=["POST"])
-def detect_road_issue():
-    file_storage = request.files.get("file")
-    if file_storage is None or file_storage.filename == "":
-        return jsonify({"success": False, "error": "No image file provided"}), 400
-
-    created = ai_bridge.create_detection_job(file_storage, filename=file_storage.filename)
-
-    if created.get("status") == "failed":
-        return jsonify(created), 400
-
-    if created.get("status") == "complete":
-        language = get_user_language(request)
-        result = created["result"]
-        return jsonify({
-            "jobId": created["job_id"],
-            "status": "complete",
-            "label": result["label"],
-            "confidence": result["confidence"],
-            "severity": result["severity"],
-            "description": result["description"],
-            "bbox": result.get("bbox"),
-            "message": LocalizationService.get_message("reports.report_submitted", language),
-            "language": language,
-        })
-
-    return jsonify({"jobId": created["job_id"], "status": created.get("status", "processing")})
-
-
-@app.route("/roads/detect/<job_id>", methods=["GET"])
-def road_detection_status(job_id: str):
-    current = ai_bridge.poll_detection_job(job_id)
-
-    if current.get("status") == "failed":
-        if current.get("error") == "Job not found":
-            return jsonify(current), 404
-        return jsonify(current), 400
-
-    if current.get("status") == "complete":
-        result = current["result"]
-        return jsonify({
-            "jobId": job_id,
-            "status": "complete",
-            "label": result["label"],
-            "confidence": result["confidence"],
-            "severity": result["severity"],
-            "description": result["description"],
-            "bbox": result.get("bbox"),
-        })
-
-    return jsonify({"jobId": job_id, "status": current.get("status", "processing")})
-
+# ── Maps Routes ───────────────────────────────────────────────────────────────
 
 @app.route("/maps/reverse-geocode", methods=["GET"])
 def reverse_geo():
@@ -359,7 +572,6 @@ def reverse_geo():
     lng = _coerce_float(request.args.get("lng"))
     if lat is None or lng is None:
         return jsonify({"success": False, "error": "lat and lng are required"}), 400
-
     return jsonify(reverse_geocode(lat, lng))
 
 
@@ -376,9 +588,10 @@ def nearby_hospital_list():
     return jsonify(nearby_hospitals(lat, lng, radius_km=radius_km or 5.0, limit=limit))
 
 
+# ── SOS Routes ────────────────────────────────────────────────────────────────
+
 @app.route("/sos/activate", methods=["POST"])
 def sos_activate():
-    language = get_user_language(request)
     payload = _parse_payload()
     result = sos_model.activate_sos(
         location=payload.get("location"),
@@ -387,13 +600,13 @@ def sos_activate():
         note=payload.get("note", ""),
         device_info=payload.get("device_info"),
     )
-    if isinstance(result, dict):
-        result = {
-            **result,
-            "message": LocalizationService.get_message("sos.sos_triggered", language),
-            "language": language,
-        }
     return jsonify(result)
+
+
+# Also support /sos for frontend compatibility
+@app.route("/sos", methods=["POST"])
+def sos_activate_compat():
+    return sos_activate()
 
 
 if __name__ == "__main__":

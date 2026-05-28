@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useTranslation } from "react-i18next";
 import HospitalMarker from "./HospitalMarker";
 import AccidentPin from "./AccidentPin";
 
@@ -114,7 +113,7 @@ function LayerToggle({ label, active, color, onClick }) {
 }
 
 // ── Status bar ──────────────────────────────────────────────────────────────
-function StatusBar({ hospitals, accidents, userLocation, t }) {
+function StatusBar({ hospitals, accidents, userLocation }) {
   return (
     <div style={{
       position: "absolute",
@@ -126,11 +125,11 @@ function StatusBar({ hospitals, accidents, userLocation, t }) {
       flexWrap: "wrap",
     }}>
       {[
-        { color: "#22c55e", count: hospitals.length, labelKey: "hospitals" },
-        { color: "#ef4444", count: accidents.length, labelKey: "incidents" },
-        { color: "#3b82f6", count: userLocation ? 1 : 0, labelKey: "you" },
-      ].map(({ color, count, labelKey }) => (
-        <div key={labelKey} style={{
+        { color: "#22c55e", count: hospitals.length,  label: "Hospitals" },
+        { color: "#ef4444", count: accidents.length,  label: "Incidents" },
+        { color: "#3b82f6", count: userLocation ? 1 : 0, label: "You" },
+      ].map(({ color, count, label }) => (
+        <div key={label} style={{
           display: "flex",
           alignItems: "center",
           gap: 6,
@@ -150,7 +149,7 @@ function StatusBar({ hospitals, accidents, userLocation, t }) {
           <span style={{ fontWeight: 600, color: count > 0 ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.25)" }}>
             {count}
           </span>
-          <span>{t(`mapUi.${labelKey}`)}</span>
+          <span>{label}</span>
         </div>
       ))}
     </div>
@@ -169,7 +168,6 @@ export default function MapView({
   showHeatmap: initialHeatmap = false,
   className = "",
 }) {
-  const { t } = useTranslation();
   const mapRef        = useRef(null);
   const mapInstance   = useRef(null);
   const heatmapLayer  = useRef(null);
@@ -186,11 +184,11 @@ export default function MapView({
 
   // ── Load Maps API ───────────────────────────────────────────────────────
   useEffect(() => {
-    if (!apiKey) { setLoadError(t("mapUi.noApiKey")); return; }
+    if (!apiKey) { setLoadError("No Google Maps API key provided."); return; }
     loadGoogleMaps(apiKey)
       .then(() => setMapsReady(true))
-      .catch(() => setLoadError(t("mapUi.loadFailed")));
-  }, [apiKey, t]);
+      .catch(() => setLoadError("Failed to load Google Maps."));
+  }, [apiKey]);
 
   // ── Initialise map instance ─────────────────────────────────────────────
   useEffect(() => {
@@ -232,7 +230,7 @@ export default function MapView({
         scaledSize: new window.google.maps.Size(36, 36),
         anchor: new window.google.maps.Point(18, 18),
       },
-      title: t("mapUi.yourLocation"),
+      title: "Your Location",
       zIndex: 1000,
     });
     return () => { if (userMarker.current) userMarker.current.setMap(null); };
@@ -485,7 +483,7 @@ export default function MapView({
         {!mapsReady && !loadError && (
           <div className="mapview-placeholder">
             <div className="mapview-spinner" />
-            <span>{t("mapUi.initialising")}</span>
+            <span>Initialising map…</span>
           </div>
         )}
         {loadError && (
@@ -502,12 +500,12 @@ export default function MapView({
         {mapsReady && (
           <>
             <div className="mapview-zoom">
-              <button className="mapview-zoom-btn" onClick={zoomIn}  aria-label={t("mapUi.zoomIn")}>+</button>
-              <button className="mapview-zoom-btn" onClick={zoomOut} aria-label={t("mapUi.zoomOut")}>−</button>
+              <button className="mapview-zoom-btn" onClick={zoomIn}  aria-label="Zoom in">+</button>
+              <button className="mapview-zoom-btn" onClick={zoomOut} aria-label="Zoom out">−</button>
             </div>
 
             {/* Recenter */}
-            <button className="mapview-recenter" onClick={recenter} aria-label={t("mapUi.recenter")}>
+            <button className="mapview-recenter" onClick={recenter} aria-label="Recenter map">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                 <circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
               </svg>
@@ -515,11 +513,11 @@ export default function MapView({
 
             {/* Layer toggles — right panel */}
             <div className="mapview-layers">
-              <LayerToggle label={t("mapUi.hospitals")}  active={showHospitals} color="#22c55e" onClick={() => setShowHospitals(v => !v)} />
-              <LayerToggle label={t("mapUi.incidents")}  active={showAccidents} color="#ef4444" onClick={() => setShowAccidents(v => !v)} />
-              <LayerToggle label={t("mapUi.heatmap")}    active={showHeatmap}   color="#f97316" onClick={() => setShowHeatmap(v => !v)} />
+              <LayerToggle label="Hospitals"  active={showHospitals} color="#22c55e" onClick={() => setShowHospitals(v => !v)} />
+              <LayerToggle label="Incidents"  active={showAccidents} color="#ef4444" onClick={() => setShowAccidents(v => !v)} />
+              <LayerToggle label="Heatmap"    active={showHeatmap}   color="#f97316" onClick={() => setShowHeatmap(v => !v)} />
               <LayerToggle
-                label={mapType === "roadmap" ? t("mapUi.satellite") : t("mapUi.map")}
+                label={mapType === "roadmap" ? "Satellite" : "Map"}
                 active={false}
                 color="rgba(255,255,255,0.4)"
                 onClick={() => setMapType(t => t === "roadmap" ? "satellite" : "roadmap")}
@@ -527,7 +525,7 @@ export default function MapView({
             </div>
 
             {/* Status bar */}
-            <StatusBar hospitals={hospitals} accidents={accidents} userLocation={userLocation} t={t} />
+            <StatusBar hospitals={hospitals} accidents={accidents} userLocation={userLocation} />
 
             {/* Markers — rendered as custom OverlayViews via child components */}
             {mapInstance.current && showHospitals && hospitals.map((h, i) => (

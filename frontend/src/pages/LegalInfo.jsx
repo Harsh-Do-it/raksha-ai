@@ -41,32 +41,115 @@ function PageShell({ title, subtitle, children, navigate, activeNav }) {
   );
 }
 
-const LAW_DEFS = [
-  { id: "L1", key: "speeding", categoryKey: "speed", section: "Section 183", severity: "high", tags: ["highway", "urban", "school zone"] },
-  { id: "L2", key: "dangerous", categoryKey: "driving", section: "Section 184", severity: "critical", tags: ["racing", "rash driving"] },
-  { id: "L3", key: "dui", categoryKey: "impairment", section: "Section 185", severity: "critical", tags: ["alcohol", "BAC", "impairment"] },
-  { id: "L4", key: "seatbelt", categoryKey: "safety", section: "Section 194B", severity: "medium", tags: ["seatbelt", "safety"] },
-  { id: "L5", key: "helmet", categoryKey: "safety", section: "Section 194C", severity: "medium", tags: ["helmet", "two-wheeler", "motorcycle"] },
-  { id: "L6", key: "redLight", categoryKey: "signals", section: "Section 177A", severity: "high", tags: ["traffic light", "signal", "red light"] },
-  { id: "L7", key: "mobile", categoryKey: "mobile", section: "Section 194D", severity: "high", tags: ["mobile", "phone", "distraction"] },
-  { id: "L8", key: "wrongSide", categoryKey: "lane", section: "Section 119", severity: "high", tags: ["one-way", "wrong-side", "lane"] },
-  { id: "L9", key: "overloading", categoryKey: "overloading", section: "Section 194A", severity: "medium", tags: ["cargo", "passengers", "capacity"] },
-  { id: "L10", key: "insurance", categoryKey: "insurance", section: "Section 196", severity: "high", tags: ["insurance", "uninsured"] },
-  { id: "L11", key: "licence", categoryKey: "documents", section: "Section 130", severity: "critical", tags: ["licence", "DL", "documents"] },
-  { id: "L12", key: "racing", categoryKey: "speed", section: "Section 112", severity: "critical", tags: ["racing", "speed", "competition"] },
+/* â”€â”€ Law data (Motor Vehicles Act 2019 amended fines) â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const LAWS = [
+  {
+    id:"L1", section:"Section 183", category:"Speed",
+    title:"Over-speeding",
+    desc:"Driving above prescribed speed limits on highways, urban roads, or school zones.",
+    first: "â‚¹1,000â€“2,000", repeat: "â‚¹2,000+", imprisonment: null,
+    tags:["highway","urban","school zone"],
+    severity:"high",
+  },
+  {
+    id:"L2", section:"Section 184", category:"Driving",
+    title:"Dangerous Driving",
+    desc:"Driving in a manner that endangers life or property of others. Includes racing and rash driving.",
+    first: "â‚¹1,000â€“5,000", repeat: "â‚¹10,000", imprisonment: "6 monthsâ€“1 year",
+    tags:["racing","rash driving"],
+    severity:"critical",
+  },
+  {
+    id:"L3", section:"Section 185", category:"Impairment",
+    title:"Drunken Driving (DUI)",
+    desc:"Driving with blood alcohol content exceeding 30mg/100ml of blood.",
+    first: "â‚¹10,000", repeat: "â‚¹15,000", imprisonment: "6 monthsâ€“2 years",
+    tags:["alcohol","BAC","impairment"],
+    severity:"critical",
+  },
+  {
+    id:"L4", section:"Section 194B", category:"Safety",
+    title:"Seatbelt Violation",
+    desc:"Driver or front-seat passenger not wearing seatbelt while vehicle is in motion.",
+    first: "â‚¹1,000", repeat: "â‚¹1,000", imprisonment: null,
+    tags:["seatbelt","safety"],
+    severity:"medium",
+  },
+  {
+    id:"L5", section:"Section 194C", category:"Safety",
+    title:"Helmet Not Worn",
+    desc:"Two-wheeler rider or pillion not wearing an ISI-certified helmet.",
+    first: "â‚¹1,000 + 3-month licence suspension", repeat: "â‚¹2,000", imprisonment: null,
+    tags:["helmet","two-wheeler","motorcycle"],
+    severity:"medium",
+  },
+  {
+    id:"L6", section:"Section 177A", category:"Signals",
+    title:"Jumping Red Light",
+    desc:"Proceeding past a red traffic signal without stopping at the designated stop line.",
+    first: "â‚¹5,000", repeat: "â‚¹10,000", imprisonment: null,
+    tags:["traffic light","signal","red light"],
+    severity:"high",
+  },
+  {
+    id:"L7", section:"Section 194D", category:"Mobile",
+    title:"Mobile Phone Use While Driving",
+    desc:"Using a handheld mobile phone for talking, texting, or any purpose while driving.",
+    first: "â‚¹5,000", repeat: "â‚¹10,000", imprisonment: null,
+    tags:["mobile","phone","distraction"],
+    severity:"high",
+  },
+  {
+    id:"L8", section:"Section 119", category:"Lane",
+    title:"Wrong-side Driving",
+    desc:"Driving on the incorrect side of the road or against traffic flow on a one-way street.",
+    first: "â‚¹1,000", repeat: "â‚¹2,000", imprisonment: null,
+    tags:["one-way","wrong-side","lane"],
+    severity:"high",
+  },
+  {
+    id:"L9", section:"Section 194A", category:"Overloading",
+    title:"Vehicle Overloading",
+    desc:"Carrying passengers or cargo beyond the registered capacity of the vehicle.",
+    first: "â‚¹20,000 + â‚¹2,000 per extra tonne", repeat: "Double fine", imprisonment: null,
+    tags:["cargo","passengers","capacity"],
+    severity:"medium",
+  },
+  {
+    id:"L10", section:"Section 196", category:"Insurance",
+    title:"Driving Without Insurance",
+    desc:"Operating a motor vehicle on a public road without valid third-party insurance.",
+    first: "â‚¹2,000 or 3 months imprisonment", repeat: "â‚¹4,000 or 3 months", imprisonment: "3 months",
+    tags:["insurance","uninsured"],
+    severity:"high",
+  },
+  {
+    id:"L11", section:"Section 130", category:"Documents",
+    title:"Driving Without Licence",
+    desc:"Operating a motor vehicle without a valid driving licence or a learner's licence.",
+    first: "â‚¹5,000", repeat: "â‚¹10,000", imprisonment: "3 months",
+    tags:["licence","DL","documents"],
+    severity:"critical",
+  },
+  {
+    id:"L12", section:"Section 112", category:"Speed",
+    title:"Unauthorised Racing / Trials",
+    desc:"Participating in any speed contest or trial on a public road without prior written government permission.",
+    first: "â‚¹5,000", repeat: "â‚¹10,000", imprisonment: "3 months",
+    tags:["racing","speed","competition"],
+    severity:"critical",
+  },
 ];
 
-const CATEGORY_KEYS = ["all", "speed", "safety", "signals", "driving", "mobile", "lane", "overloading", "insurance", "documents", "impairment"];
-
+const CATEGORIES = ["All", "Speed", "Safety", "Signals", "Driving", "Mobile", "Lane", "Overloading", "Insurance", "Documents", "Impairment"];
 const SEV = {
-  critical: { color: "#dc2626", bg: "rgba(220,38,38,0.1)", border: "rgba(220,38,38,0.25)", labelKey: "critical" },
-  high: { color: "#f97316", bg: "rgba(249,115,22,0.1)", border: "rgba(249,115,22,0.22)", labelKey: "high" },
-  medium: { color: "#eab308", bg: "rgba(234,179,8,0.1)", border: "rgba(234,179,8,0.2)", labelKey: "medium" },
+  critical:{ color:"#dc2626", bg:"rgba(220,38,38,0.1)",  border:"rgba(220,38,38,0.25)",  label:"Critical" },
+  high:    { color:"#f97316", bg:"rgba(249,115,22,0.1)",  border:"rgba(249,115,22,0.22)", label:"High"     },
+  medium:  { color:"#eab308", bg:"rgba(234,179,8,0.1)",   border:"rgba(234,179,8,0.2)",   label:"Medium"   },
 };
 
-function LawCard({ law, expanded, onToggle, t }) {
+function LawCard({ law, expanded, onToggle }) {
   const sev = SEV[law.severity] || SEV.medium;
-  const sevLabel = t(`dashboardLive.severity.${sev.labelKey}`);
 
   return (
     <div style={{
@@ -90,17 +173,17 @@ function LawCard({ law, expanded, onToggle, t }) {
           <div style={{ display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5 }}>
             <span style={{ fontFamily:"'Bebas Neue',cursive",fontSize:16,letterSpacing:1.5,color:"#f1f5f9" }}>{law.title}</span>
             <span style={{ fontSize:9,padding:"1px 7px",borderRadius:4,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(255,255,255,0.35)",fontFamily:"'DM Mono',monospace",letterSpacing:1 }}>{law.section}</span>
-            <span style={{ fontSize:9,padding:"1px 7px",borderRadius:4,background:sev.bg,border:`1px solid ${sev.border}`,color:sev.color,fontFamily:"'DM Mono',monospace",letterSpacing:"0.5px" }}>{sevLabel}</span>
+            <span style={{ fontSize:9,padding:"1px 7px",borderRadius:4,background:sev.bg,border:`1px solid ${sev.border}`,color:sev.color,fontFamily:"'DM Mono',monospace",letterSpacing:"0.5px" }}>{sev.label}</span>
           </div>
           <div style={{ fontSize:12,color:"rgba(255,255,255,0.4)",lineHeight:1.55,marginBottom:8 }}>{law.desc}</div>
 
           <div style={{ display:"flex",gap:16 }}>
             <div>
-              <div style={{ fontSize:9,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.25)",letterSpacing:1,marginBottom:2 }}>{t("legalPage.firstOffence").toUpperCase()}</div>
+              <div style={{ fontSize:9,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.25)",letterSpacing:1,marginBottom:2 }}>FIRST OFFENCE</div>
               <div style={{ fontSize:13,fontFamily:"'Bebas Neue',cursive",color:"#f97316",letterSpacing:1 }}>{law.first}</div>
             </div>
             <div>
-              <div style={{ fontSize:9,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.25)",letterSpacing:1,marginBottom:2 }}>{t("legalPage.repeatOffence").toUpperCase()}</div>
+              <div style={{ fontSize:9,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.25)",letterSpacing:1,marginBottom:2 }}>REPEAT OFFENCE</div>
               <div style={{ fontSize:13,fontFamily:"'Bebas Neue',cursive",color:"#dc2626",letterSpacing:1 }}>{law.repeat}</div>
             </div>
           </div>
@@ -117,7 +200,7 @@ function LawCard({ law, expanded, onToggle, t }) {
           {law.imprisonment && (
             <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:12,padding:"8px 12px",borderRadius:8,background:"rgba(220,38,38,0.06)",border:"1px solid rgba(220,38,38,0.18)" }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span style={{ fontSize:11,color:"#f87171",fontFamily:"'DM Mono',monospace" }}>{t("legalPage.imprisonment", { term: law.imprisonment })}</span>
+              <span style={{ fontSize:11,color:"#f87171",fontFamily:"'DM Mono',monospace" }}>Imprisonment: {law.imprisonment}</span>
             </div>
           )}
 
@@ -136,38 +219,22 @@ function LawCard({ law, expanded, onToggle, t }) {
 
 export default function LegalInfo() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
-  const [search, setSearch] = useState("");
-  const [cat, setCat] = useState("all");
+  const { t } = useTranslation();
+  const [search, setSearch]   = useState("");
+  const [cat, setCat]         = useState("All");
   const [expanded, setExpanded] = useState(null);
 
-  const laws = useMemo(
-    () =>
-      LAW_DEFS.map((def) => {
-        const imprisonment = t(`legalPage.lawEntries.${def.key}.imprisonment`);
-        return {
-          ...def,
-          title: t(`legalPage.lawEntries.${def.key}.title`),
-          desc: t(`legalPage.lawEntries.${def.key}.desc`),
-          first: t(`legalPage.lawEntries.${def.key}.first`),
-          repeat: t(`legalPage.lawEntries.${def.key}.repeat`),
-          imprisonment: imprisonment && imprisonment.trim() ? imprisonment : null,
-        };
-      }),
-    [t, i18n.language]
-  );
-
   const filtered = useMemo(() => {
-    let list = laws;
-    if (cat !== "all") list = list.filter((l) => l.categoryKey === cat);
+    let list = LAWS;
+    if (cat !== "All") list = list.filter(l => l.category === cat);
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter((l) =>
+      list = list.filter(l =>
         [l.title, l.section, l.desc, ...l.tags].join(" ").toLowerCase().includes(q)
       );
     }
     return list;
-  }, [search, cat, laws]);
+  }, [search, cat]);
 
   return (
     <>
@@ -204,7 +271,7 @@ export default function LegalInfo() {
             {/* Category filter */}
             <div style={{ background:"#080c14",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:"14px",display:"flex",flexDirection:"column",gap:4 }}>
               <div style={{ fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:2,color:"rgba(255,255,255,0.25)",marginBottom:8,textTransform:"uppercase" }}>{t("legalPage.category")}</div>
-              {CATEGORY_KEYS.map((c) => (
+              {CATEGORIES.map(c => (
                 <button key={c} onClick={() => setCat(c)} style={{
                   padding:"7px 12px",borderRadius:7,border:"none",
                   background: cat===c ? "rgba(220,38,38,0.14)" : "transparent",
@@ -213,9 +280,9 @@ export default function LegalInfo() {
                   cursor:"pointer",textAlign:"left",transition:"all 0.15s",
                   fontWeight: cat===c ? 600 : 400,
                 }}>
-                  {t(`legalPage.categories.${c}`)}
-                  {c!=="all" && <span style={{ marginLeft:8,fontSize:10,color:"rgba(255,255,255,0.2)" }}>
-                    {laws.filter((l) => l.categoryKey === c).length}
+                  {c}
+                  {c!=="All" && <span style={{ marginLeft:8,fontSize:10,color:"rgba(255,255,255,0.2)" }}>
+                    {LAWS.filter(l=>l.category===c).length}
                   </span>}
                 </button>
               ))}
@@ -225,16 +292,14 @@ export default function LegalInfo() {
             <div style={{ background:"#080c14",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:16 }}>
               <div style={{ fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:2,color:"rgba(255,255,255,0.25)",marginBottom:12,textTransform:"uppercase" }}>{t("legalPage.quickFacts")}</div>
               {[
-                { labelKey: "maxFine", valueKey: "maxFine", color: "#dc2626" },
-                { labelKey: "drunkMax", valueKey: "drunkMax", color: "#f97316" },
-                { labelKey: "listed", valueKey: "listed", color: "#3b82f6" },
-                { labelKey: "actVersion", valueKey: "actVersion", color: "#22c55e" },
-              ].map((f) => (
-                <div key={f.labelKey} style={{ display:"flex",justifyContent:"space-between",marginBottom:9,alignItems:"center" }}>
-                  <span style={{ fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"'DM Mono',monospace" }}>{t(`legalPage.facts.${f.labelKey}`)}</span>
-                  <span style={{ fontSize:11,fontFamily:"'Bebas Neue',cursive",color:f.color,letterSpacing:1 }}>
-                    {t(`legalPage.factsValues.${f.valueKey}`, { count: laws.length })}
-                  </span>
+                { label:"Max single fine",  value:"â‚¹20,000", color:"#dc2626" },
+                { label:"Drunk driving max", value:"â‚¹15,000+", color:"#f97316" },
+                { label:"Offences listed",   value:`${LAWS.length} laws`,   color:"#3b82f6" },
+                { label:"Act version",       value:"MV Act 2019", color:"#22c55e" },
+              ].map(f => (
+                <div key={f.label} style={{ display:"flex",justifyContent:"space-between",marginBottom:9,alignItems:"center" }}>
+                  <span style={{ fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"'DM Mono',monospace" }}>{f.label}</span>
+                  <span style={{ fontSize:11,fontFamily:"'Bebas Neue',cursive",color:f.color,letterSpacing:1 }}>{f.value}</span>
                 </div>
               ))}
             </div>
@@ -252,7 +317,7 @@ export default function LegalInfo() {
           <div>
             <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14 }}>
               <div style={{ fontFamily:"'DM Mono',monospace",fontSize:11,color:"rgba(255,255,255,0.3)" }}>
-                {t("legalPage.showing")} <strong style={{ color:"rgba(255,255,255,0.6)" }}>{filtered.length}</strong> {t("legalPage.ofRules", { count: laws.length })}
+                {t("legalPage.showing")} <strong style={{ color:"rgba(255,255,255,0.6)" }}>{filtered.length}</strong> {t("legalPage.ofRules", { count: LAWS.length })}
               </div>
               {search && (
                 <button onClick={() => setSearch("")} style={{ fontSize:11,color:"rgba(255,255,255,0.3)",background:"none",border:"none",cursor:"pointer",fontFamily:"'DM Mono',monospace",textDecoration:"underline" }}>
@@ -273,7 +338,6 @@ export default function LegalInfo() {
                     law={law}
                     expanded={expanded === law.id}
                     onToggle={() => setExpanded(expanded === law.id ? null : law.id)}
-                    t={t}
                   />
                 ))
               )}

@@ -1,22 +1,15 @@
-﻿import { useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ReportIssue from './pages/ReportIssue';
 import RiskAlert from './pages/RiskAlert';
 import SOSPage from './pages/SOSPage';
 import LegalInfo from './pages/LegalInfo';
+import LoginPage from './pages/LoginPage';
+import AdminPage from './pages/AdminPage';
 import { LanguageProvider } from './context/LanguageContext';
 
 export default function App() {
-  const { i18n } = useTranslation();
-
-  useEffect(() => {
-    const lang = (i18n.language || 'en').split('-')[0];
-    document.documentElement.lang = lang;
-  }, [i18n.language]);
-
   return (
     <LanguageProvider>
       <Routes>
@@ -26,9 +19,10 @@ export default function App() {
         <Route path="/risk-alert" element={<RiskAlert />} />
         <Route path="/sos" element={<SOSPage />} />
         <Route path="/legal-info" element={<LegalInfo />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </LanguageProvider>
   );
 }
-

@@ -6,7 +6,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 DEMO_SCRIPTS = [
-    ("risk_pridiction", BASE_DIR / "risk_pridiction" / "demo.py"),
+    ("risk_prediction", BASE_DIR / "risk_prediction" / "demo.py"),
     ("pothole_detection", BASE_DIR / "pothole_detection" / "demo.py"),
 ]
 

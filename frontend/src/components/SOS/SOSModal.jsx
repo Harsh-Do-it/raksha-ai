@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useState, useEffect, useCallback } from "react";
 
 /**
  * SOSModal — emergency alert flow for Raksha AI
@@ -47,7 +46,6 @@ const ICONS = {
 };
 
 export default function SOSModal({ onClose, onAlertSent }) {
-  const { t } = useTranslation();
   const [stage, setStage]       = useState("confirm"); // confirm → locating → sending → sent
   const [countdown, setCountdown] = useState(COUNTDOWN_SEC);
   const [location, setLocation] = useState(null);
@@ -65,8 +63,8 @@ export default function SOSModal({ onClose, onAlertSent }) {
   function startLocating() {
     setStage("locating");
     if (!navigator.geolocation) {
-      setLocError(t("sosModal.geoNotSupported"));
-      setLocation({ lat: 28.6139, lng: 77.2090, label: t("sosModal.defaultLocation") });
+      setLocError("Geolocation not supported — using default location.");
+      setLocation({ lat: 28.6139, lng: 77.2090, label: "New Delhi (default)" });
       setTimeout(() => setStage("sending"), 1200);
       return;
     }
@@ -80,8 +78,8 @@ export default function SOSModal({ onClose, onAlertSent }) {
         setStage("sending");
       },
       () => {
-        setLocError(t("sosModal.geoFailed"));
-        setLocation({ lat: 28.6139, lng: 77.2090, label: t("sosModal.approxLocation") });
+        setLocError("Could not access GPS — using approximate location.");
+        setLocation({ lat: 28.6139, lng: 77.2090, label: "New Delhi (approx.)" });
         setStage("sending");
       },
       { timeout: 6000, maximumAge: 0 }
@@ -591,21 +589,21 @@ export default function SOSModal({ onClose, onAlertSent }) {
       `}</style>
 
       <div className="sos-overlay" onClick={e => { if (e.target === e.currentTarget && stage === "confirm") onClose(); }}>
-        <div className="sos-modal" role="dialog" aria-modal="true" aria-label={t("sosModal.ariaLabel")}>
+        <div className="sos-modal" role="dialog" aria-modal="true" aria-label="SOS Emergency Alert">
 
           {/* Header */}
           <div className="sm-header">
             <div className="sm-header-left">
-              <span className="sm-badge">{t("sosModal.badge")}</span>
+              <span className="sm-badge">SOS</span>
               <span className="sm-title">
-                {stage === "confirm"  && t("sosModal.stages.confirm")}
-                {stage === "locating" && t("sosModal.stages.locating")}
-                {stage === "sending"  && t("sosModal.stages.sending")}
-                {stage === "sent"     && t("sosModal.stages.sent")}
+                {stage === "confirm"  && "Emergency Alert"}
+                {stage === "locating" && "Locating You…"}
+                {stage === "sending"  && "Dispatching…"}
+                {stage === "sent"     && "Alert Dispatched"}
               </span>
             </div>
             {(stage === "confirm" || stage === "sent") && (
-              <button className="sm-close" onClick={onClose} aria-label={t("sosModal.close")}>
+              <button className="sm-close" onClick={onClose} aria-label="Close">
                 <Icon d={ICONS.close} size={16} />
               </button>
             )}
@@ -626,21 +624,18 @@ export default function SOSModal({ onClose, onAlertSent }) {
                 </svg>
                 <div className="sm-ring-num">
                   <span className="sm-countdown-n">{countdown}</span>
-                  <span className="sm-countdown-label">{t("sosModal.seconds")}</span>
+                  <span className="sm-countdown-label">seconds</span>
                 </div>
               </div>
 
               <p className="sm-confirm-text">
-                {t("sosModal.confirmIntro")}
-                <strong>{t("sosModal.liveLocation")}</strong>
-                {t("sosModal.confirmMiddle")}
-                <strong>{t("sosModal.emergencyContacts")}</strong>
-                {t("sosModal.confirmEnd")}
+                An SOS alert with your <strong>live location</strong> will be sent to
+                emergency services and your <strong>emergency contacts</strong>.
               </p>
 
               <div className="sm-actions">
-                <button className="sm-btn-cancel" onClick={onClose}>{t("sosModal.cancel")}</button>
-                <button className="sm-btn-send" onClick={startLocating}>{t("sosModal.sendNow")}</button>
+                <button className="sm-btn-cancel" onClick={onClose}>Cancel</button>
+                <button className="sm-btn-send" onClick={startLocating}>Send Now</button>
               </div>
             </div>
           )}
@@ -650,11 +645,11 @@ export default function SOSModal({ onClose, onAlertSent }) {
             <div className="sm-body">
               <div className="sm-loader-wrap">
                 <div className="sm-spinner" />
-                <div className="sm-loader-title">{t("sosModal.acquiringGps")}</div>
-                <div className="sm-loader-sub">{t("sosModal.keepOpen")}</div>
+                <div className="sm-loader-title">Acquiring GPS Signal</div>
+                <div className="sm-loader-sub">Please keep the app open…</div>
                 <div className="sm-signal">
                   <Icon d={ICONS.signal} size={14} color="rgba(255,255,255,0.3)" />
-                  {t("sosModal.searchingSatellites")}
+                  Searching for satellites
                 </div>
               </div>
             </div>
@@ -665,8 +660,8 @@ export default function SOSModal({ onClose, onAlertSent }) {
             <div className="sm-body">
               <div className="sm-loader-wrap">
                 <div className="sm-spinner" />
-                <div className="sm-loader-title">{t("sosModal.contactingServices")}</div>
-                <div className="sm-loader-sub">{t("sosModal.notifyingUnits")}</div>
+                <div className="sm-loader-title">Contacting Emergency Services</div>
+                <div className="sm-loader-sub">Notifying nearby units &amp; your contacts…</div>
               </div>
             </div>
           )}
@@ -679,8 +674,8 @@ export default function SOSModal({ onClose, onAlertSent }) {
                 <div className="sm-success-icon">
                   <Icon d={ICONS.check} size={28} color="#22c55e" strokeWidth={2.2} />
                 </div>
-                <div className="sm-success-title">{t("sosModal.alertSent")}</div>
-                <div className="sm-success-sub">{t("sosModal.servicesNotified")}</div>
+                <div className="sm-success-title">Alert Sent</div>
+                <div className="sm-success-sub">Emergency services have been notified</div>
 
                 {/* Geolocation warning */}
                 {locError && (
@@ -704,14 +699,14 @@ export default function SOSModal({ onClose, onAlertSent }) {
                     <Icon d={ICONS.ambulance} size={20} color="#ef4444" />
                   </div>
                   <div className="sm-eta-info">
-                    <div className="sm-eta-label">{t("sosModal.ambulanceEta")}</div>
+                    <div className="sm-eta-label">Ambulance ETA</div>
                     <div className="sm-eta-value">{MOCK_ETA}</div>
-                    <div className="sm-eta-dispatch">{t("sosModal.unitDispatched")}</div>
+                    <div className="sm-eta-dispatch">Unit dispatched — tracking live</div>
                   </div>
                 </div>
 
                 {/* Nearby hospitals */}
-                <div className="sm-section-title">{t("sosModal.nearbyHospitals")}</div>
+                <div className="sm-section-title">Nearby Hospitals</div>
                 <div className="sm-hospitals">
                   {MOCK_HOSPITALS.map((h, i) => (
                     <div className="sm-hospital-row" key={i}>
@@ -720,10 +715,10 @@ export default function SOSModal({ onClose, onAlertSent }) {
                       </div>
                       <div className="sm-hospital-info">
                         <div className="sm-hospital-name">{h.name}</div>
-                        <div className="sm-hospital-meta">{h.distance} {t("sosModal.away")}</div>
+                        <div className="sm-hospital-meta">{h.distance} away</div>
                       </div>
                       <div className="sm-hospital-eta">{h.eta}</div>
-                      <a href={`tel:${h.phone}`} className="sm-call-btn" aria-label={t("sosModal.callHospital", { name: h.name })}>
+                      <a href={`tel:${h.phone}`} className="sm-call-btn" aria-label={`Call ${h.name}`}>
                         <Icon d={ICONS.phone} size={14} />
                       </a>
                     </div>
@@ -732,7 +727,7 @@ export default function SOSModal({ onClose, onAlertSent }) {
               </div>
 
               <div className="sm-footer">
-                <button className="sm-btn-done" onClick={onClose}>{t("sosModal.done")}</button>
+                <button className="sm-btn-done" onClick={onClose}>Done</button>
               </div>
             </>
           )}

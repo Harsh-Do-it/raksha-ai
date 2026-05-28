@@ -17,7 +17,6 @@
  */
 
 import { getAuthToken } from "./authService";
-import { apiLanguageHeaders } from "../utils/apiLanguage";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const BASE_URL       = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000";
@@ -53,11 +52,11 @@ async function fetchWithRetry(url, options = {}, retries = MAX_RETRIES) {
     const res = await fetch(url, {
       ...options,
       signal: controller.signal,
-      headers: apiLanguageHeaders({
+      headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {}),
-      }),
+      },
     });
 
     clearTimeout(timer);

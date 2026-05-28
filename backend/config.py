@@ -9,7 +9,7 @@ class Config:
     DEBUG = os.getenv("FLASK_DEBUG", "1" if FLASK_ENV == "development" else "0").lower() in {"1", "true", "yes", "on"}
     HOST = os.getenv("HOST", "0.0.0.0")
     PORT = int(os.getenv("PORT", "5000"))
-    SECRET_KEY = os.getenv("SECRET_KEY", "raksha-ai-dev-secret")
+    SECRET_KEY = os.getenv("SECRET_KEY") or os.urandom(32).hex()  # Set SECRET_KEY in .env for production
     UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", str(BASE_DIR / "uploads")))
     MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", "10485760"))
     GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")

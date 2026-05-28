@@ -1,7 +1,8 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "../components/LanguageSelector";
+import { getIssues } from "../services/roadService";
 
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Dashboard.jsx â€” Raksha AI analytics command centre
@@ -382,7 +383,7 @@ function MapPlaceholder({ navigate }) {
 }
 
 /* â”€â”€ Main Dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-const ZONES = [
+const FALLBACK_ZONES = [
   { name: "NH-48 Ring Road",      count: 142 },
   { name: "Mathura Road Flyover", count: 118 },
   { name: "Outer Ring Road N",    count: 97  },
@@ -390,23 +391,81 @@ const ZONES = [
   { name: "Mehrauli-Gurgaon Rd",  count: 71  },
 ];
 
-const RECENT_ISSUES = [
-  { id:1, typeKey:"pothole", severity:"critical", road:"NH-48, KM 14", area:"Mahipalpur", reportedAt:"18 min ago", status:"verified", statusKey:"verified" },
-  { id:2, typeKey:"waterlogging", severity:"high", road:"Outer Ring Road", area:"Nangloi", reportedAt:"1 hr ago", status:"in-progress", statusKey:"inProgress" },
-  { id:3, typeKey:"damagedRoad", severity:"high", road:"Mathura Road", area:"Badarpur", reportedAt:"3 hrs ago", status:"pending", statusKey:"pending" },
-  { id:4, typeKey:"brokenDivider", severity:"medium", road:"Rohini Sec-3", area:"Rohini", reportedAt:"5 hrs ago", status:"pending", statusKey:"pending" },
-  { id:5, typeKey:"missingSign", severity:"medium", road:"DND Entry", area:"Noida Link", reportedAt:"8 hrs ago", status:"verified", statusKey:"verified" },
-];
-
 export default function Dashboard() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [time, setTime] = useState(new Date());
+  const [liveIssues, setLiveIssues] = useState([]);
+  const [zones, setZones] = useState(FALLBACK_ZONES);
+  const [stats, setStats] = useState({ total: 0, pending: 0, resolved: 0 });
+  const [loadingIssues, setLoadingIssues] = useState(true);
 
   useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoadingIssues(true);
+      try {
+        const data = await getIssues({ limit: 10 });
+        const items = data.items || [];
+        setLiveIssues(items);
+        // Build hotspot zones from UNRESOLVED road names only
+        const areaCounts = {};
+        items
+          .filter(r => r.status !== "resolved")
+          .forEach(r => {
+            const key = r.road || r.area || "Unknown";
+            areaCounts[key] = (areaCounts[key] || 0) + 1;
+          });
+        const sortedZones = Object.entries(areaCounts)
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+        if (sortedZones.length > 0) setZones(sortedZones);
+        // Stats
+        const pending = items.filter(i => i.status === "pending").length;
+        const resolved = items.filter(i => i.status === "resolved").length;
+        setStats({ total: data.total || items.length, pending, resolved });
+      } catch {
+        // Fall back to static data silently
+      } finally {
+        setLoadingIssues(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  // Normalize live issues for the RecentIssues component
+  const SEV_MAP = { critical: "critical", high: "high", medium: "medium", low: "low" };
+  const STATUS_KEY_MAP = { pending: "pending", verified: "verified", "in-progress": "inProgress", resolved: "resolved" };
+  const TYPE_KEY_MAP = { Pothole: "pothole", "Damaged Road": "damagedRoad", Waterlogging: "waterlogging", "Broken Divider": "brokenDivider", "Missing Sign": "missingSign", Other: "other" };
+
+  function timeAgo(isoStr) {
+    if (!isoStr) return "";
+    const diff = Date.now() - new Date(isoStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins} min ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs} hr ago`;
+    return `${Math.floor(hrs / 24)} days ago`;
+  }
+
+  const displayIssues = liveIssues.length > 0
+    ? liveIssues.slice(0, 5).map(r => ({
+        id: r.id,
+        typeKey: TYPE_KEY_MAP[r.type] || "other",
+        severity: SEV_MAP[r.severity] || "medium",
+        road: r.road,
+        area: r.area || "",
+        reportedAt: timeAgo(r.created_at),
+        status: r.status,
+        statusKey: STATUS_KEY_MAP[r.status] || "pending",
+      }))
+    : [];
 
   return (
     <>
@@ -419,24 +478,39 @@ export default function Dashboard() {
       >
         {/* KPI row */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px,1fr))", gap: 12, marginBottom: 20 }}>
-          <StatCard label={t("dashboardLive.activeIncidents")} value="14" sub={`↑ ${t("dashboardLive.sinceYesterday")}`} color="#dc2626"
+          <StatCard label={t("dashboardLive.activeIncidents")} value={stats.pending || "—"} sub={`${stats.pending} pending review`} color="#dc2626"
             icon="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          <StatCard label={t("dashboardLive.issuesReported")} value="2,847" sub={`↑ ${t("dashboardLive.today")}`} color="#f97316"
+          <StatCard label={t("dashboardLive.issuesReported")} value={stats.total || "—"} sub="All time total" color="#f97316"
             icon="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" />
           <StatCard label={t("dashboardLive.sosActivations")} value="341" sub={t("dashboardLive.thisMonth")} color="#22c55e"
             icon="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zm-5 0a4 4 0 1 1-8 0 4 4 0 0 1 8 0z" />
-          <StatCard label={t("dashboardLive.resolvedIssues")} value="89%" sub={t("dashboardLive.resolutionRate")} color="#3b82f6"
+          <StatCard label={t("dashboardLive.resolvedIssues")} value={stats.resolved || "—"} sub="Issues resolved" color="#3b82f6"
             icon="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 0-2 2h-2a2 2 0 0 0-2-2z" />
         </div>
 
         {/* Map + Hotspot row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 12, marginBottom: 20 }}>
           <MapPlaceholder navigate={navigate} />
-          <MiniHotspotChart zones={ZONES} />
+          <MiniHotspotChart zones={zones} />
         </div>
 
         {/* Recent issues */}
-        <RecentIssues issues={RECENT_ISSUES} />
+        {loadingIssues ? (
+          <div style={{ textAlign: "center", padding: 32, color: "rgba(255,255,255,0.25)", fontSize: 13, fontFamily: "'DM Mono',monospace", letterSpacing: 1 }}>Loading reports…</div>
+        ) : displayIssues.length > 0 ? (
+          <RecentIssues issues={displayIssues} />
+        ) : (
+          <div style={{
+            background: "#080c14", border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 12,
+            padding: "48px 24px", textAlign: "center",
+          }}>
+            <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 18, letterSpacing: 2, color: "rgba(255,255,255,0.2)", marginBottom: 8 }}>No Reports Yet</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.2)", marginBottom: 20 }}>Be the first to report a road issue in your area.</div>
+            <button onClick={() => navigate("/report-issue")} style={{ padding: "9px 22px", borderRadius: 8, border: "none", background: "#dc2626", color: "white", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+              Report an Issue →
+            </button>
+          </div>
+        )}
       </PageShell>
     </>
   );
