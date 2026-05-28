@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import SOSModal from "./SOSModal";
 
 /**
@@ -11,6 +12,7 @@ import SOSModal from "./SOSModal";
  *   onAlertSent(payload) — optional callback after SOS is dispatched
  */
 export default function SOSButton({ onAlertSent }) {
+  const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [pressed, setPressed]     = useState(false);
   const [ripples, setRipples]     = useState([]);
@@ -247,13 +249,13 @@ export default function SOSButton({ onAlertSent }) {
             aria-label="Send SOS emergency alert"
           >
             <span className="sos-label">SOS</span>
-            <span className="sos-sub">Emergency</span>
+            <span className="sos-sub">{t("sosPage.buttonSub")}</span>
           </button>
         </div>
 
         <div className="sos-status">
           <span className="sos-dot" />
-          System active — GPS ready
+          {t("sosPage.ready")}
         </div>
 
         <p className="sos-hint">

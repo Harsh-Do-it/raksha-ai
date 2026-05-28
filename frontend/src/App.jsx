@@ -1,4 +1,6 @@
-﻿import { Routes, Route } from 'react-router-dom';
+﻿import { useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ReportIssue from './pages/ReportIssue';
@@ -8,6 +10,13 @@ import LegalInfo from './pages/LegalInfo';
 import { LanguageProvider } from './context/LanguageContext';
 
 export default function App() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const lang = (i18n.language || 'en').split('-')[0];
+    document.documentElement.lang = lang;
+  }, [i18n.language]);
+
   return (
     <LanguageProvider>
       <Routes>

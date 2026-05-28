@@ -17,6 +17,7 @@ from models.SosModel import RakshaAISOS
 from services.ai_bridge import RakshaAIBridge
 from services.firebase_service import get_firebase_status
 from services.maps_service import nearby_hospitals, reverse_geocode
+from services.localization_service import LocalizationService, get_user_language
 
 
 def create_app() -> Flask:
@@ -311,6 +312,7 @@ def detect_road_issue():
         return jsonify(created), 400
 
     if created.get("status") == "complete":
+        language = get_user_language(request)
         result = created["result"]
         return jsonify({
             "jobId": created["job_id"],
@@ -320,6 +322,8 @@ def detect_road_issue():
             "severity": result["severity"],
             "description": result["description"],
             "bbox": result.get("bbox"),
+            "message": LocalizationService.get_message("reports.report_submitted", language),
+            "language": language,
         })
 
     return jsonify({"jobId": created["job_id"], "status": created.get("status", "processing")})
@@ -374,6 +378,7 @@ def nearby_hospital_list():
 
 @app.route("/sos/activate", methods=["POST"])
 def sos_activate():
+    language = get_user_language(request)
     payload = _parse_payload()
     result = sos_model.activate_sos(
         location=payload.get("location"),
@@ -382,6 +387,12 @@ def sos_activate():
         note=payload.get("note", ""),
         device_info=payload.get("device_info"),
     )
+    if isinstance(result, dict):
+        result = {
+            **result,
+            "message": LocalizationService.get_message("sos.sos_triggered", language),
+            "language": language,
+        }
     return jsonify(result)
 
 

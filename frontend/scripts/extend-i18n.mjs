@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { pagePatches } from "./locale-page-patches.mjs";
 
 const localeRoot = path.resolve("src/i18n/locales");
 
@@ -441,11 +442,14 @@ const translated = {
   },
 };
 
+// Merge full page-section patches (dashboard, report, legal, etc.)
+for (const [lang, patch] of Object.entries(pagePatches)) {
+  translated[lang] = { ...(translated[lang] || {}), ...patch };
+}
+
+// Non-English locales must not inherit additions.en (English page copy).
 for (const lang of Object.keys(translated)) {
-  additions[lang] = {
-    ...additions.en,
-    ...translated[lang],
-  };
+  additions[lang] = translated[lang];
 }
 
 function merge(target, source) {
@@ -462,6 +466,7 @@ function merge(target, source) {
 for (const lang of fs.readdirSync(localeRoot)) {
   const file = path.join(localeRoot, lang, "translation.json");
   const json = JSON.parse(fs.readFileSync(file, "utf8"));
-  merge(json, additions[lang] ?? additions.en);
+  const patch = lang === "en" ? additions.en : additions[lang];
+  if (patch) merge(json, patch);
   fs.writeFileSync(file, `${JSON.stringify(json, null, 2)}\n`, "utf8");
 }

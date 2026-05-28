@@ -366,6 +366,98 @@
       "listed": "Offences listed",
       "actVersion": "Act version"
     },
+    "lawEntries": {
+      "speeding": {
+        "title": "Over-speeding",
+        "desc": "Driving above prescribed speed limits on highways, urban roads, or school zones.",
+        "first": "₹1,000–2,000",
+        "repeat": "₹2,000+",
+        "imprisonment": ""
+      },
+      "dangerous": {
+        "title": "Dangerous Driving",
+        "desc": "Driving in a manner that endangers life or property of others. Includes racing and rash driving.",
+        "first": "₹1,000–5,000",
+        "repeat": "₹10,000",
+        "imprisonment": "6 months–1 year"
+      },
+      "dui": {
+        "title": "Drunken Driving (DUI)",
+        "desc": "Driving with blood alcohol content exceeding 30mg/100ml of blood.",
+        "first": "₹10,000",
+        "repeat": "₹15,000",
+        "imprisonment": "6 months–2 years"
+      },
+      "seatbelt": {
+        "title": "Seatbelt Violation",
+        "desc": "Driver or front-seat passenger not wearing seatbelt while vehicle is in motion.",
+        "first": "₹1,000",
+        "repeat": "₹1,000",
+        "imprisonment": ""
+      },
+      "helmet": {
+        "title": "Helmet Not Worn",
+        "desc": "Two-wheeler rider or pillion not wearing an ISI-certified helmet.",
+        "first": "₹1,000 + 3-month licence suspension",
+        "repeat": "₹2,000",
+        "imprisonment": ""
+      },
+      "redLight": {
+        "title": "Jumping Red Light",
+        "desc": "Proceeding past a red traffic signal without stopping at the designated stop line.",
+        "first": "₹5,000",
+        "repeat": "₹10,000",
+        "imprisonment": ""
+      },
+      "mobile": {
+        "title": "Mobile Phone Use While Driving",
+        "desc": "Using a handheld mobile phone for talking, texting, or any purpose while driving.",
+        "first": "₹5,000",
+        "repeat": "₹10,000",
+        "imprisonment": ""
+      },
+      "wrongSide": {
+        "title": "Wrong-side Driving",
+        "desc": "Driving on the incorrect side of the road or against traffic flow on a one-way street.",
+        "first": "₹1,000",
+        "repeat": "₹2,000",
+        "imprisonment": ""
+      },
+      "overloading": {
+        "title": "Vehicle Overloading",
+        "desc": "Carrying passengers or cargo beyond the registered capacity of the vehicle.",
+        "first": "₹20,000 + ₹2,000 per extra tonne",
+        "repeat": "Double fine",
+        "imprisonment": ""
+      },
+      "insurance": {
+        "title": "Driving Without Insurance",
+        "desc": "Operating a motor vehicle on a public road without valid third-party insurance.",
+        "first": "₹2,000 or 3 months imprisonment",
+        "repeat": "₹4,000 or 3 months",
+        "imprisonment": "3 months"
+      },
+      "licence": {
+        "title": "Driving Without Licence",
+        "desc": "Operating a motor vehicle without a valid driving licence or a learner's licence.",
+        "first": "₹5,000",
+        "repeat": "₹10,000",
+        "imprisonment": "3 months"
+      },
+      "racing": {
+        "title": "Unauthorised Racing / Trials",
+        "desc": "Participating in any speed contest or trial on a public road without prior written government permission.",
+        "first": "₹5,000",
+        "repeat": "₹10,000",
+        "imprisonment": "3 months"
+      }
+    },
+    "factsValues": {
+      "maxFine": "₹20,000",
+      "drunkMax": "₹15,000+",
+      "listed": "{{count}} laws",
+      "actVersion": "MV Act 2019"
+    },
     "laws": {
       "speedingTitle": "Over-speeding",
       "speedingDesc": "Driving above prescribed speed limits on highways, urban roads, or school zones.",
@@ -392,5 +484,71 @@
       "racingTitle": "Unauthorised Racing / Trials",
       "racingDesc": "Participating in any speed contest or trial on a public road without prior written government permission."
     }
+  },
+  "sosModal": {
+    "ariaLabel": "SOS Emergency Alert",
+    "badge": "SOS",
+    "close": "Close",
+    "stages": {
+      "confirm": "Emergency Alert",
+      "locating": "Locating You…",
+      "sending": "Dispatching…",
+      "sent": "Alert Dispatched"
+    },
+    "seconds": "seconds",
+    "confirmIntro": "An SOS alert with your ",
+    "liveLocation": "live location",
+    "confirmMiddle": " will be sent to emergency services and your ",
+    "emergencyContacts": "emergency contacts",
+    "confirmEnd": ".",
+    "cancel": "Cancel",
+    "sendNow": "Send Now",
+    "acquiringGps": "Acquiring GPS Signal",
+    "keepOpen": "Please keep the app open…",
+    "searchingSatellites": "Searching for satellites",
+    "contactingServices": "Contacting Emergency Services",
+    "notifyingUnits": "Notifying nearby units & your contacts…",
+    "alertSent": "Alert Sent",
+    "servicesNotified": "Emergency services have been notified",
+    "geoNotSupported": "Geolocation not supported — using default location.",
+    "geoFailed": "Could not access GPS — using approximate location.",
+    "defaultLocation": "New Delhi (default)",
+    "approxLocation": "New Delhi (approx.)",
+    "ambulanceEta": "Ambulance ETA",
+    "unitDispatched": "Unit dispatched — tracking live",
+    "nearbyHospitals": "Nearby Hospitals",
+    "away": "away",
+    "done": "Done",
+    "callHospital": "Call {{name}}"
+  },
+  "mapUi": {
+    "yourLocation": "Your Location",
+    "noApiKey": "No Google Maps API key provided.",
+    "loadFailed": "Failed to load Google Maps.",
+    "initialising": "Initialising map…",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "recenter": "Recenter map",
+    "hospitals": "Hospitals",
+    "incidents": "Incidents",
+    "heatmap": "Heatmap",
+    "satellite": "Satellite",
+    "map": "Map",
+    "you": "You",
+    "reportedIssues": "Reported Issues",
+    "searchPlaceholder": "Search road, area, type…",
+    "all": "All",
+    "hotspotsTitle": "Accident Hotspots",
+    "hotspotsSubtitle": "Last 30 days · Auto-refreshed",
+    "totalIncidents": "Total Incidents",
+    "peakHour": "Peak Hour",
+    "trending": "Trending ↑",
+    "total24h": "TOTAL / 24H"
+  },
+  "locationErrors": {
+    "denied": "Location access denied. Please enable GPS in your browser settings.",
+    "unavailable": "Position unavailable. Check your GPS signal.",
+    "timeout": "Location request timed out. Please try again.",
+    "unknown": "An unknown location error occurred."
   }
 }

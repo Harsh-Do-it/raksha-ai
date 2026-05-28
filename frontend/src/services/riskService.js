@@ -25,6 +25,7 @@
  */
 
 import { getAuthToken } from "./authService";
+import { apiLanguageHeaders } from "../utils/apiLanguage";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const BASE_URL  = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000";
@@ -54,11 +55,11 @@ async function apiFetch(path, opts = {}) {
   const token = await getAuthToken().catch(() => null);
   const res = await fetch(`${BASE_URL}${path}`, {
     ...opts,
-    headers: {
+    headers: apiLanguageHeaders({
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(opts.headers || {}),
-    },
+    }),
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
