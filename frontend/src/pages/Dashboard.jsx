@@ -18,6 +18,7 @@ function PageShell({ title, subtitle, children, navigate, activeNav = "dashboard
     { key: "report-issue", labelKey: "navigation.reportIssue", path: "/report-issue" },
     { key: "risk-alert", labelKey: "navigation.riskAlertPlural", path: "/risk-alert" },
     { key: "legal-info", labelKey: "navigation.legal", path: "/legal-info" },
+    { key: "status", labelKey: "navigation.checkStatus", path: "/status" },
   ];
 
   return (
@@ -66,7 +67,7 @@ function PageShell({ title, subtitle, children, navigate, activeNav = "dashboard
                 borderRadius: 6, cursor: "pointer",
                 padding: "4px 11px",
                 fontSize: 11, fontWeight: 500,
-                color: activeNav === l.key ? "#f87171" : "rgba(255,255,255,0.4)",
+                color: activeNav === l.key ? "#f87171" : "rgba(255,255,255,0.85)",
                 fontFamily: "'DM Sans',sans-serif",
                 transition: "all 0.15s",
                 whiteSpace: "nowrap",

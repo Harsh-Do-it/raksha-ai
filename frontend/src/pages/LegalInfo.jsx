@@ -1,20 +1,22 @@
-﻿import { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "../components/LanguageSelector";
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   LegalInfo.jsx â€” Traffic laws & fines awareness module
-   Prototype â€” Indian Motor Vehicle Act reference
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─────────────────────────────────────────────────────────────
+   LegalInfo.jsx — Traffic laws & fines awareness module
+   Prototype — Indian Motor Vehicle Act reference
+   ───────────────────────────────────────────────────────────── */
 
 function PageShell({ title, subtitle, children, navigate, activeNav }) {
   const { t } = useTranslation();
   const links = [
     { key:"home",labelKey:"navigation.home",path:"/" },{ key:"dashboard",labelKey:"navigation.dashboard",path:"/dashboard" },
     { key:"sos",labelKey:"navigation.sos",path:"/sos" },{ key:"report-issue",labelKey:"navigation.reportIssue",path:"/report-issue" },
-    { key:"risk-alert",labelKey:"navigation.riskAlertPlural",path:"/risk-alert" },{ key:"legal-info",labelKey:"navigation.legal",path:"/legal-info" },
+    { key:"risk-alert",labelKey:"navigation.riskAlertPlural",path:"/risk-alert" },
+    { key:"legal-info",labelKey:"navigation.legal",path:"/legal-info" },
+    { key:"status",labelKey:"navigation.checkStatus",path:"/status" },
   ];
   return (
     <div style={{ minHeight:"100vh",background:"#060810",color:"#e2e8f0",fontFamily:"'DM Sans',sans-serif",display:"flex",flexDirection:"column" }}>
@@ -25,119 +27,83 @@ function PageShell({ title, subtitle, children, navigate, activeNav }) {
             <span style={{ fontFamily:"'Bebas Neue',cursive",fontSize:15,letterSpacing:2.5,color:"#f1f5f9" }}>RAKSHA AI</span>
           </div>
           <div style={{ display:"flex",gap:2,borderLeft:"1px solid rgba(255,255,255,0.06)",paddingLeft:16 }}>
-            {links.map(l => <button key={l.key} onClick={()=>navigate(l.path)} style={{ background:activeNav===l.key?"rgba(220,38,38,0.12)":"none",border:activeNav===l.key?"1px solid rgba(220,38,38,0.25)":"1px solid transparent",borderRadius:6,cursor:"pointer",padding:"4px 11px",fontSize:11,fontWeight:500,color:activeNav===l.key?"#f87171":"rgba(255,255,255,0.4)",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",whiteSpace:"nowrap" }}>{t(l.labelKey)}</button>)}
+            {links.map(l => <button key={l.key} onClick={()=>navigate(l.path)} style={{ background:activeNav===l.key?"rgba(220,38,38,0.12)":"none",border:activeNav===l.key?"1px solid rgba(220,38,38,0.25)":"1px solid transparent",borderRadius:6,cursor:"pointer",padding:"4px 11px",fontSize:11,fontWeight:500,color:activeNav===l.key?"#f87171":"rgba(255,255,255,0.85)",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",whiteSpace:"nowrap" }}>{t(l.labelKey)}</button>)}
           </div>
         </div>
         <LanguageSelector />
         <button onClick={()=>navigate("/sos")} style={{ padding:"6px 16px",borderRadius:7,background:"#dc2626",border:"none",color:"white",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:"0.5px",boxShadow:"0 0 16px rgba(220,38,38,0.35)",fontFamily:"'DM Sans',sans-serif",flexShrink:0 }}>SOS</button>
       </div>
       <div style={{ padding:"20px 28px 8px",borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
-        <div style={{ fontFamily:"'DM Mono',monospace",fontSize:10,letterSpacing:2,color:"rgba(255,255,255,0.25)",marginBottom:6 }}>RAKSHA AI / {title.toUpperCase()}</div>
-        <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:28,letterSpacing:3,color:"#f1f5f9",lineHeight:1 }}>{title}</div>
-        {subtitle && <div style={{ fontSize:12,color:"rgba(255,255,255,0.3)",marginTop:5 }}>{subtitle}</div>}
+        <div style={{ fontFamily:"'DM Mono',monospace",fontSize:10,letterSpacing:2,color:"rgba(255,255,255,0.25)",marginBottom:6 }}>RAKSHA AI / {t(title).toUpperCase()}</div>
+        <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:28,letterSpacing:3,color:"#f1f5f9",lineHeight:1 }}>{t(title)}</div>
+        {subtitle && <div style={{ fontSize:12,color:"rgba(255,255,255,0.3)",marginTop:5 }}>{t(subtitle)}</div>}
       </div>
       <div style={{ flex:1,padding:"24px 28px",overflowY:"auto" }}>{children}</div>
     </div>
   );
 }
 
-/* â”€â”€ Law data (Motor Vehicles Act 2019 amended fines) â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Law data (Motor Vehicles Act 2019 amended fines) ───────── */
 const LAWS = [
   {
-    id:"L1", section:"Section 183", category:"Speed",
-    title:"Over-speeding",
-    desc:"Driving above prescribed speed limits on highways, urban roads, or school zones.",
-    first: "â‚¹1,000â€“2,000", repeat: "â‚¹2,000+", imprisonment: null,
-    tags:["highway","urban","school zone"],
-    severity:"high",
+    id:"L1", section:"Section 183", category:"Speed", transKey:"speeding",
+    first: "₹1,000–2,000", repeat: "₹2,000+", imprisonment: null,
+    tags:["highway","urban","school zone"], severity:"high",
   },
   {
-    id:"L2", section:"Section 184", category:"Driving",
-    title:"Dangerous Driving",
-    desc:"Driving in a manner that endangers life or property of others. Includes racing and rash driving.",
-    first: "â‚¹1,000â€“5,000", repeat: "â‚¹10,000", imprisonment: "6 monthsâ€“1 year",
-    tags:["racing","rash driving"],
-    severity:"critical",
+    id:"L2", section:"Section 184", category:"Driving", transKey:"dangerous",
+    first: "₹1,000–5,000", repeat: "₹10,000", imprisonment: "6 months–1 year",
+    tags:["racing","rash driving"], severity:"critical",
   },
   {
-    id:"L3", section:"Section 185", category:"Impairment",
-    title:"Drunken Driving (DUI)",
-    desc:"Driving with blood alcohol content exceeding 30mg/100ml of blood.",
-    first: "â‚¹10,000", repeat: "â‚¹15,000", imprisonment: "6 monthsâ€“2 years",
-    tags:["alcohol","BAC","impairment"],
-    severity:"critical",
+    id:"L3", section:"Section 185", category:"Impairment", transKey:"dui",
+    first: "₹10,000", repeat: "₹15,000", imprisonment: "6 months–2 years",
+    tags:["alcohol","BAC","impairment"], severity:"critical",
   },
   {
-    id:"L4", section:"Section 194B", category:"Safety",
-    title:"Seatbelt Violation",
-    desc:"Driver or front-seat passenger not wearing seatbelt while vehicle is in motion.",
-    first: "â‚¹1,000", repeat: "â‚¹1,000", imprisonment: null,
-    tags:["seatbelt","safety"],
-    severity:"medium",
+    id:"L4", section:"Section 194B", category:"Safety", transKey:"seatbelt",
+    first: "₹1,000", repeat: "₹1,000", imprisonment: null,
+    tags:["seatbelt","safety"], severity:"medium",
   },
   {
-    id:"L5", section:"Section 194C", category:"Safety",
-    title:"Helmet Not Worn",
-    desc:"Two-wheeler rider or pillion not wearing an ISI-certified helmet.",
-    first: "â‚¹1,000 + 3-month licence suspension", repeat: "â‚¹2,000", imprisonment: null,
-    tags:["helmet","two-wheeler","motorcycle"],
-    severity:"medium",
+    id:"L5", section:"Section 194C", category:"Safety", transKey:"helmet",
+    first: "₹1,000 + 3-month licence suspension", repeat: "₹2,000", imprisonment: null,
+    tags:["helmet","two-wheeler","motorcycle"], severity:"medium",
   },
   {
-    id:"L6", section:"Section 177A", category:"Signals",
-    title:"Jumping Red Light",
-    desc:"Proceeding past a red traffic signal without stopping at the designated stop line.",
-    first: "â‚¹5,000", repeat: "â‚¹10,000", imprisonment: null,
-    tags:["traffic light","signal","red light"],
-    severity:"high",
+    id:"L6", section:"Section 177A", category:"Signals", transKey:"redLight",
+    first: "₹5,000", repeat: "₹10,000", imprisonment: null,
+    tags:["traffic light","signal","red light"], severity:"high",
   },
   {
-    id:"L7", section:"Section 194D", category:"Mobile",
-    title:"Mobile Phone Use While Driving",
-    desc:"Using a handheld mobile phone for talking, texting, or any purpose while driving.",
-    first: "â‚¹5,000", repeat: "â‚¹10,000", imprisonment: null,
-    tags:["mobile","phone","distraction"],
-    severity:"high",
+    id:"L7", section:"Section 194D", category:"Mobile", transKey:"mobile",
+    first: "₹5,000", repeat: "₹10,000", imprisonment: null,
+    tags:["mobile","phone","distraction"], severity:"high",
   },
   {
-    id:"L8", section:"Section 119", category:"Lane",
-    title:"Wrong-side Driving",
-    desc:"Driving on the incorrect side of the road or against traffic flow on a one-way street.",
-    first: "â‚¹1,000", repeat: "â‚¹2,000", imprisonment: null,
-    tags:["one-way","wrong-side","lane"],
-    severity:"high",
+    id:"L8", section:"Section 119", category:"Lane", transKey:"wrongSide",
+    first: "₹1,000", repeat: "₹2,000", imprisonment: null,
+    tags:["one-way","wrong-side","lane"], severity:"high",
   },
   {
-    id:"L9", section:"Section 194A", category:"Overloading",
-    title:"Vehicle Overloading",
-    desc:"Carrying passengers or cargo beyond the registered capacity of the vehicle.",
-    first: "â‚¹20,000 + â‚¹2,000 per extra tonne", repeat: "Double fine", imprisonment: null,
-    tags:["cargo","passengers","capacity"],
-    severity:"medium",
+    id:"L9", section:"Section 194A", category:"Overloading", transKey:"overloading",
+    first: "₹20,000 + ₹2,000 per extra tonne", repeat: "Double fine", imprisonment: null,
+    tags:["cargo","passengers","capacity"], severity:"medium",
   },
   {
-    id:"L10", section:"Section 196", category:"Insurance",
-    title:"Driving Without Insurance",
-    desc:"Operating a motor vehicle on a public road without valid third-party insurance.",
-    first: "â‚¹2,000 or 3 months imprisonment", repeat: "â‚¹4,000 or 3 months", imprisonment: "3 months",
-    tags:["insurance","uninsured"],
-    severity:"high",
+    id:"L10", section:"Section 196", category:"Insurance", transKey:"insurance",
+    first: "₹2,000 or 3 months imprisonment", repeat: "₹4,000 or 3 months", imprisonment: "3 months",
+    tags:["insurance","uninsured"], severity:"high",
   },
   {
-    id:"L11", section:"Section 130", category:"Documents",
-    title:"Driving Without Licence",
-    desc:"Operating a motor vehicle without a valid driving licence or a learner's licence.",
-    first: "â‚¹5,000", repeat: "â‚¹10,000", imprisonment: "3 months",
-    tags:["licence","DL","documents"],
-    severity:"critical",
+    id:"L11", section:"Section 130", category:"Documents", transKey:"licence",
+    first: "₹5,000", repeat: "₹10,000", imprisonment: "3 months",
+    tags:["licence","DL","documents"], severity:"critical",
   },
   {
-    id:"L12", section:"Section 112", category:"Speed",
-    title:"Unauthorised Racing / Trials",
-    desc:"Participating in any speed contest or trial on a public road without prior written government permission.",
-    first: "â‚¹5,000", repeat: "â‚¹10,000", imprisonment: "3 months",
-    tags:["racing","speed","competition"],
-    severity:"critical",
+    id:"L12", section:"Section 112", category:"Speed", transKey:"racing",
+    first: "₹5,000", repeat: "₹10,000", imprisonment: "3 months",
+    tags:["racing","speed","competition"], severity:"critical",
   },
 ];
 
@@ -171,19 +137,19 @@ function LawCard({ law, expanded, onToggle }) {
 
         <div style={{ flex:1,minWidth:0 }}>
           <div style={{ display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5 }}>
-            <span style={{ fontFamily:"'Bebas Neue',cursive",fontSize:16,letterSpacing:1.5,color:"#f1f5f9" }}>{law.title}</span>
+            <span style={{ fontFamily:"'Bebas Neue',cursive",fontSize:16,letterSpacing:1.5,color:"#f1f5f9" }}>{law.t(`legalPage.laws.${law.transKey}Title`)}</span>
             <span style={{ fontSize:9,padding:"1px 7px",borderRadius:4,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(255,255,255,0.35)",fontFamily:"'DM Mono',monospace",letterSpacing:1 }}>{law.section}</span>
-            <span style={{ fontSize:9,padding:"1px 7px",borderRadius:4,background:sev.bg,border:`1px solid ${sev.border}`,color:sev.color,fontFamily:"'DM Mono',monospace",letterSpacing:"0.5px" }}>{sev.label}</span>
+            <span style={{ fontSize:9,padding:"1px 7px",borderRadius:4,background:sev.bg,border:`1px solid ${sev.border}`,color:sev.color,fontFamily:"'DM Mono',monospace",letterSpacing:"0.5px" }}>{law.t(`legalPage.labels.${law.severity}`) || sev.label}</span>
           </div>
-          <div style={{ fontSize:12,color:"rgba(255,255,255,0.4)",lineHeight:1.55,marginBottom:8 }}>{law.desc}</div>
+          <div style={{ fontSize:12,color:"rgba(255,255,255,0.85)",lineHeight:1.55,marginBottom:8 }}>{law.t(`legalPage.laws.${law.transKey}Desc`)}</div>
 
           <div style={{ display:"flex",gap:16 }}>
             <div>
-              <div style={{ fontSize:9,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.25)",letterSpacing:1,marginBottom:2 }}>FIRST OFFENCE</div>
+              <div style={{ fontSize:9,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.25)",letterSpacing:1,marginBottom:2 }}>{law.t('legalPage.firstOffence').toUpperCase()}</div>
               <div style={{ fontSize:13,fontFamily:"'Bebas Neue',cursive",color:"#f97316",letterSpacing:1 }}>{law.first}</div>
             </div>
             <div>
-              <div style={{ fontSize:9,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.25)",letterSpacing:1,marginBottom:2 }}>REPEAT OFFENCE</div>
+              <div style={{ fontSize:9,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.25)",letterSpacing:1,marginBottom:2 }}>{law.t('legalPage.repeatOffence').toUpperCase()}</div>
               <div style={{ fontSize:13,fontFamily:"'Bebas Neue',cursive",color:"#dc2626",letterSpacing:1 }}>{law.repeat}</div>
             </div>
           </div>
@@ -200,7 +166,7 @@ function LawCard({ law, expanded, onToggle }) {
           {law.imprisonment && (
             <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:12,padding:"8px 12px",borderRadius:8,background:"rgba(220,38,38,0.06)",border:"1px solid rgba(220,38,38,0.18)" }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span style={{ fontSize:11,color:"#f87171",fontFamily:"'DM Mono',monospace" }}>Imprisonment: {law.imprisonment}</span>
+              <span style={{ fontSize:11,color:"#f87171",fontFamily:"'DM Mono',monospace" }}>{law.t('legalPage.imprisonment', {term: law.imprisonment})}</span>
             </div>
           )}
 
@@ -230,11 +196,11 @@ export default function LegalInfo() {
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(l =>
-        [l.title, l.section, l.desc, ...l.tags].join(" ").toLowerCase().includes(q)
+        [t(`legalPage.laws.${l.transKey}Title`), l.section, t(`legalPage.laws.${l.transKey}Desc`), ...l.tags].join(" ").toLowerCase().includes(q)
       );
     }
-    return list;
-  }, [search, cat]);
+    return list.map(l => ({ ...l, t }));
+  }, [search, cat, t]);
 
   return (
     <>
@@ -248,88 +214,84 @@ export default function LegalInfo() {
       `}</style>
 
       <PageShell title={t("legalPage.title")} subtitle={t("legalPage.subtitle")} navigate={navigate} activeNav="legal-info">
+        <div style={{ maxWidth:1100,margin:"0 auto",display:"flex",gap:32,alignItems:"flex-start",flexWrap:"wrap" }}>
+          
+          {/* Left Sidebar */}
+          <div style={{ width:280,flexShrink:0,display:"flex",flexDirection:"column",gap:24,position:"sticky",top:100 }}>
+            {/* Disclaimer */}
+            <div style={{ background:"rgba(234,179,8,0.06)",border:"1px solid rgba(234,179,8,0.2)",borderRadius:12,padding:16 }}>
+              <div style={{ display:"flex",alignItems:"center",gap:8,color:"#eab308",marginBottom:8 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span style={{ fontFamily:"'DM Mono',monospace",fontSize:11,fontWeight:600,letterSpacing:0.5 }}>{t('legalPage.prototypeTitle')}</span>
+              </div>
+              <div style={{ fontSize:11,color:"rgba(234,179,8,0.8)",lineHeight:1.6 }}>
+                {t('legalPage.prototype')}
+              </div>
+            </div>
 
-        {/* Prototype notice */}
-        <div style={{ marginBottom:20,padding:"10px 16px",borderRadius:9,border:"1px solid rgba(234,179,8,0.25)",background:"rgba(234,179,8,0.06)",display:"flex",alignItems:"flex-start",gap:10 }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="1.8" strokeLinecap="round" style={{ marginTop:2,flexShrink:0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <div style={{ fontSize:11,color:"rgba(234,179,8,0.8)",lineHeight:1.6,fontFamily:"'DM Mono',monospace" }}>
-            <strong>{t("legalPage.prototypeTitle")}</strong> - {t("legalPage.prototype")}
-          </div>
-        </div>
-
-        <div style={{ display:"grid",gridTemplateColumns:"260px 1fr",gap:20,maxWidth:1060,margin:"0 auto" }}>
-
-          {/* â”€â”€ Left sidebar: filters + quick stats â”€â”€ */}
-          <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
-
-            {/* Search */}
             <div style={{ position:"relative" }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" style={{ position:"absolute",left:11,top:"50%",transform:"translateY(-50%)",pointerEvents:"none" }}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input className="li-search" placeholder={t("legalPage.searchPlaceholder")} value={search} onChange={e => setSearch(e.target.value)} />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position:"absolute",left:12,top:9 }}>
+                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="text"
+                placeholder={t('legalPage.searchPlaceholder')}
+                value={search}
+                onChange={e=>setSearch(e.target.value)}
+                className="li-search"
+              />
             </div>
 
-            {/* Category filter */}
-            <div style={{ background:"#080c14",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:"14px",display:"flex",flexDirection:"column",gap:4 }}>
-              <div style={{ fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:2,color:"rgba(255,255,255,0.25)",marginBottom:8,textTransform:"uppercase" }}>{t("legalPage.category")}</div>
-              {CATEGORIES.map(c => (
-                <button key={c} onClick={() => setCat(c)} style={{
-                  padding:"7px 12px",borderRadius:7,border:"none",
-                  background: cat===c ? "rgba(220,38,38,0.14)" : "transparent",
-                  color: cat===c ? "#f87171" : "rgba(255,255,255,0.4)",
-                  fontSize:12, fontFamily:"'DM Sans',sans-serif",
-                  cursor:"pointer",textAlign:"left",transition:"all 0.15s",
-                  fontWeight: cat===c ? 600 : 400,
-                }}>
-                  {c}
-                  {c!=="All" && <span style={{ marginLeft:8,fontSize:10,color:"rgba(255,255,255,0.2)" }}>
-                    {LAWS.filter(l=>l.category===c).length}
-                  </span>}
-                </button>
-              ))}
-            </div>
-
-            {/* Quick facts */}
             <div style={{ background:"#080c14",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:16 }}>
-              <div style={{ fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:2,color:"rgba(255,255,255,0.25)",marginBottom:12,textTransform:"uppercase" }}>{t("legalPage.quickFacts")}</div>
-              {[
-                { label:"Max single fine",  value:"â‚¹20,000", color:"#dc2626" },
-                { label:"Drunk driving max", value:"â‚¹15,000+", color:"#f97316" },
-                { label:"Offences listed",   value:`${LAWS.length} laws`,   color:"#3b82f6" },
-                { label:"Act version",       value:"MV Act 2019", color:"#22c55e" },
-              ].map(f => (
-                <div key={f.label} style={{ display:"flex",justifyContent:"space-between",marginBottom:9,alignItems:"center" }}>
-                  <span style={{ fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"'DM Mono',monospace" }}>{f.label}</span>
-                  <span style={{ fontSize:11,fontFamily:"'Bebas Neue',cursive",color:f.color,letterSpacing:1 }}>{f.value}</span>
-                </div>
-              ))}
+              <div style={{ fontSize:10,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.3)",letterSpacing:2,marginBottom:12 }}>{t('legalPage.category').toUpperCase()}</div>
+              <div style={{ display:"flex",flexDirection:"column",gap:4 }}>
+                {CATEGORIES.map(c => (
+                  <button key={c} onClick={()=>setCat(c)} style={{ textAlign:"left",padding:"8px 12px",borderRadius:8,background:cat===c?"rgba(220,38,38,0.1)":"transparent",border:cat===c?"1px solid rgba(220,38,38,0.2)":"1px solid transparent",color:cat===c?"#f87171":"rgba(255,255,255,0.7)",fontSize:13,fontFamily:"'DM Sans',sans-serif",cursor:"pointer",transition:"all 0.15s",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+                    <span>{t(`legalPage.categories.${c.toLowerCase()}`)}</span>
+                    <span style={{ fontSize:10,fontFamily:"'DM Mono',monospace",color:cat===c?"rgba(248,113,113,0.5)":"rgba(255,255,255,0.2)" }}>
+                      {c==="All" ? "" : LAWS.filter(l=>l.category===c).length}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Future scope callout */}
-            <div style={{ padding:14,borderRadius:12,border:"1px solid rgba(59,130,246,0.2)",background:"rgba(59,130,246,0.06)" }}>
-              <div style={{ fontSize:11,fontWeight:600,color:"#60a5fa",marginBottom:4,fontFamily:"'DM Sans',sans-serif" }}>{t("legalPage.futureScope")}</div>
-              <div style={{ fontSize:11,color:"rgba(255,255,255,0.35)",lineHeight:1.6 }}>
-                {t("legalPage.futureScopeText")}
+            <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:12,padding:16 }}>
+              <div style={{ fontSize:10,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.3)",letterSpacing:2,marginBottom:12 }}>{t('legalPage.quickFacts').toUpperCase()}</div>
+              <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+                <div style={{ display:"flex",justifyContent:"space-between",fontSize:12 }}><span style={{ color:"rgba(255,255,255,0.5)" }}>{t('legalPage.facts.maxFine')}</span><span style={{ color:"#f1f5f9" }}>₹20,000+</span></div>
+                <div style={{ display:"flex",justifyContent:"space-between",fontSize:12 }}><span style={{ color:"rgba(255,255,255,0.5)" }}>{t('legalPage.facts.drunkMax')}</span><span style={{ color:"#f1f5f9" }}>₹15,000</span></div>
+                <div style={{ display:"flex",justifyContent:"space-between",fontSize:12 }}><span style={{ color:"rgba(255,255,255,0.5)" }}>{t('legalPage.facts.listed')}</span><span style={{ color:"#f1f5f9" }}>12</span></div>
+                <div style={{ display:"flex",justifyContent:"space-between",fontSize:12 }}><span style={{ color:"rgba(255,255,255,0.5)" }}>{t('legalPage.facts.actVersion')}</span><span style={{ color:"#f1f5f9" }}>2019 AMD</span></div>
+              </div>
+            </div>
+
+            <div style={{ background:"rgba(59,130,246,0.05)",border:"1px solid rgba(59,130,246,0.2)",borderRadius:12,padding:16 }}>
+              <div style={{ display:"flex",alignItems:"center",gap:8,color:"#60a5fa",marginBottom:8 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span style={{ fontFamily:"'DM Mono',monospace",fontSize:11,fontWeight:600,letterSpacing:0.5 }}>{t('legalPage.futureScope').toUpperCase()}</span>
+              </div>
+              <div style={{ fontSize:11,color:"rgba(96,165,250,0.8)",lineHeight:1.6 }}>
+                {t('legalPage.futureScopeText')}
               </div>
             </div>
           </div>
 
-          {/* â”€â”€ Right: law cards â”€â”€ */}
-          <div>
-            <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14 }}>
-              <div style={{ fontFamily:"'DM Mono',monospace",fontSize:11,color:"rgba(255,255,255,0.3)" }}>
-                {t("legalPage.showing")} <strong style={{ color:"rgba(255,255,255,0.6)" }}>{filtered.length}</strong> {t("legalPage.ofRules", { count: LAWS.length })}
+          {/* Main Content */}
+          <div style={{ flex:1,minWidth:300 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:20,borderBottom:"1px solid rgba(255,255,255,0.06)",paddingBottom:12 }}>
+              <div style={{ fontSize:12,fontFamily:"'DM Mono',monospace",color:"rgba(255,255,255,0.4)" }}>
+                {t('legalPage.showing')} <strong style={{ color:"#f1f5f9" }}>{filtered.length}</strong> {t('legalPage.ofRules', {count: LAWS.length})}
               </div>
               {search && (
-                <button onClick={() => setSearch("")} style={{ fontSize:11,color:"rgba(255,255,255,0.3)",background:"none",border:"none",cursor:"pointer",fontFamily:"'DM Mono',monospace",textDecoration:"underline" }}>
-                  {t("legalPage.clearSearch")}
-                </button>
+                <button onClick={()=>setSearch("")} style={{ background:"none",border:"none",color:"#f87171",fontSize:11,fontFamily:"'DM Mono',monospace",cursor:"pointer" }}>{t('legalPage.clearSearch')}</button>
               )}
             </div>
 
-            <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+            <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
               {filtered.length === 0 ? (
-                <div style={{ textAlign:"center",padding:"48px 0",color:"rgba(255,255,255,0.2)",fontFamily:"'DM Mono',monospace",fontSize:13 }}>
-                  {t("legalPage.noMatch")}
+                <div style={{ textAlign:"center",padding:"40px 0",color:"rgba(255,255,255,0.3)",fontSize:13,fontFamily:"'DM Mono',monospace" }}>
+                  {t('legalPage.noMatch')}
                 </div>
               ) : (
                 filtered.map(law => (

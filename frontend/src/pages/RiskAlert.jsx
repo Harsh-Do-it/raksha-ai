@@ -1,19 +1,21 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "../components/LanguageSelector";
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   RiskAlert.jsx â€” Accident risk prediction & alert page
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─────────────────────────────────────────────────────────────
+   RiskAlert.jsx — Accident risk prediction & alert page
+   ───────────────────────────────────────────────────────────── */
 
 function PageShell({ title, subtitle, children, navigate, activeNav }) {
   const { t } = useTranslation();
   const links = [
     { key:"home",labelKey:"navigation.home",path:"/" },{ key:"dashboard",labelKey:"navigation.dashboard",path:"/dashboard" },
     { key:"sos",labelKey:"navigation.sos",path:"/sos" },{ key:"report-issue",labelKey:"navigation.reportIssue",path:"/report-issue" },
-    { key:"risk-alert",labelKey:"navigation.riskAlertPlural",path:"/risk-alert" },{ key:"legal-info",labelKey:"navigation.legal",path:"/legal-info" },
+    { key:"risk-alert",labelKey:"navigation.riskAlertPlural",path:"/risk-alert" },
+    { key:"legal-info",labelKey:"navigation.legal",path:"/legal-info" },
+    { key:"status",labelKey:"navigation.checkStatus",path:"/status" },
   ];
   return (
     <div style={{ minHeight:"100vh",background:"#060810",color:"#e2e8f0",fontFamily:"'DM Sans',sans-serif",display:"flex",flexDirection:"column" }}>
@@ -24,7 +26,7 @@ function PageShell({ title, subtitle, children, navigate, activeNav }) {
             <span style={{ fontFamily:"'Bebas Neue',cursive",fontSize:15,letterSpacing:2.5,color:"#f1f5f9" }}>RAKSHA AI</span>
           </div>
           <div style={{ display:"flex",gap:2,borderLeft:"1px solid rgba(255,255,255,0.06)",paddingLeft:16 }}>
-            {links.map(l => <button key={l.key} onClick={()=>navigate(l.path)} style={{ background:activeNav===l.key?"rgba(220,38,38,0.12)":"none",border:activeNav===l.key?"1px solid rgba(220,38,38,0.25)":"1px solid transparent",borderRadius:6,cursor:"pointer",padding:"4px 11px",fontSize:11,fontWeight:500,color:activeNav===l.key?"#f87171":"rgba(255,255,255,0.4)",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",whiteSpace:"nowrap" }}>{t(l.labelKey)}</button>)}
+            {links.map(l => <button key={l.key} onClick={()=>navigate(l.path)} style={{ background:activeNav===l.key?"rgba(220,38,38,0.12)":"none",border:activeNav===l.key?"1px solid rgba(220,38,38,0.25)":"1px solid transparent",borderRadius:6,cursor:"pointer",padding:"4px 11px",fontSize:11,fontWeight:500,color:activeNav===l.key?"#f87171":"rgba(255,255,255,0.85)",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",whiteSpace:"nowrap" }}>{t(l.labelKey)}</button>)}
           </div>
         </div>
         <LanguageSelector />
@@ -95,7 +97,7 @@ function AlertItem({ alert, i }) {
       <div style={{ width:8,height:8,borderRadius:"50%",background:c,boxShadow:`0 0 6px ${c}`,marginTop:4,flexShrink:0,animation:alert.severity==="critical"?"critBlink 1.2s ease-in-out infinite":"none" }} />
       <div style={{ flex:1,minWidth:0 }}>
         <div style={{ fontSize:12,fontWeight:500,color:"rgba(255,255,255,0.75)",marginBottom:2 }}>{alert.zone}</div>
-        <div style={{ fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"'DM Mono',monospace" }}>{alert.reason} Â· {alert.time}</div>
+        <div style={{ fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"'DM Mono',monospace" }}>{alert.reason} · {alert.time}</div>
       </div>
       <span style={{ fontSize:9,padding:"2px 7px",borderRadius:4,background:c+"18",border:`1px solid ${c}33`,color:c,fontFamily:"'DM Mono',monospace",letterSpacing:"0.5px",flexShrink:0 }}>
         {alert.severity.toUpperCase()}
@@ -106,7 +108,7 @@ function AlertItem({ alert, i }) {
 
 /* Input conditions form */
 const CONDITIONS = [
-  { key:"time",    label:"Time of Day",   options:["Peak Morning (7â€“10AM)","Afternoon","Peak Evening (5â€“9PM)","Late Night","Early Morning"],   icon:"M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 5v5l4 2" },
+  { key:"time",    label:"Time of Day",   options:["Peak Morning (7–10AM)","Afternoon","Peak Evening (5–9PM)","Late Night","Early Morning"],   icon:"M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 5v5l4 2" },
   { key:"weather", label:"Weather",       options:["Clear","Light Rain","Heavy Rain","Fog","Dense Fog","Extreme Heat"],                          icon:"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z" },
   { key:"road",    label:"Road Condition",options:["Good","Minor Damage","Potholes","Waterlogged","Construction Zone","Severely Damaged"],       icon:"M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" },
   { key:"traffic", label:"Traffic Level", options:["Low","Moderate","Heavy","Stop-and-Go","Accident-Induced"],                                    icon:"M12 22V12 M12 12l-4-4 M12 12l4-4 M2 17l4-4 4 4 M14 17l4-4 4 4" },
@@ -157,7 +159,9 @@ export default function RiskAlert() {
         @keyframes alertIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
         @keyframes critBlink { 0%,100%{opacity:1} 50%{opacity:0.25} }
         @keyframes spin { to{transform:rotate(360deg)} }
-        select.ri-sel { width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;font-size:12px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.7);outline:none;transition:border-color 0.15s;cursor:pointer;appearance:none;-webkit-appearance:none; }
+        select.ri-sel { width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;font-size:12px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.7);outline:none;transition:border-color 0.2s; }
+        select.ri-sel option { background: #080c14; color: rgba(255,255,255,0.85); }
+        select.ri-sel:focus { border-color:rgba(59,130,246,0.4);background:rgba(255,255,255,0.06); }
         select.ri-sel:focus{border-color:rgba(220,38,38,0.4);}
         .ri-label{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1.2px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:5px;display:block;}
       `}</style>
@@ -165,7 +169,7 @@ export default function RiskAlert() {
 
         <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,maxWidth:960,margin:"0 auto" }}>
 
-          {/* â”€â”€ Left: prediction form â”€â”€ */}
+          {/* ── Left: prediction form ── */}
           <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
 
             <div style={{ background:"#080c14",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:20 }}>
@@ -224,7 +228,7 @@ export default function RiskAlert() {
             )}
           </div>
 
-          {/* â”€â”€ Right: gauge + live alerts â”€â”€ */}
+          {/* ── Right: gauge + live alerts ── */}
           <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
 
             {/* Risk gauge */}
@@ -245,7 +249,7 @@ export default function RiskAlert() {
               <div style={{ padding:"14px 16px",borderBottom:"1px solid rgba(255,255,255,0.05)",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
                 <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:17,letterSpacing:2,color:"#f1f5f9" }}>{t("riskPage.feed")}</div>
                 <span style={{ fontSize:9,padding:"3px 8px",borderRadius:4,background:"rgba(220,38,38,0.1)",border:"1px solid rgba(220,38,38,0.2)",color:"#f87171",fontFamily:"'DM Mono',monospace",letterSpacing:1 }}>
-                  â— LIVE
+                  ● LIVE
                 </span>
               </div>
               {ALERTS.map((a, i) => <AlertItem key={i} alert={a} i={i} />)}

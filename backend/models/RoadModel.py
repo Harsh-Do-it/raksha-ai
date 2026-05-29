@@ -3,7 +3,17 @@ from typing import Any, Dict, Iterable, Optional
 
 import numpy as np
 import random
+import json
 from PIL import Image
+
+try:
+    from google import genai
+    from google.genai import types
+    has_genai = True
+except ImportError:
+    has_genai = False
+
+from config import Config
 
 
 class RakshaRoadModel:
@@ -44,11 +54,33 @@ class RakshaRoadModel:
             "severity": "low",
             "description": "No significant road damage detected in the uploaded image.",
         },
+        {
+            "label": "Broken Divider",
+            "severity": "high",
+            "description": "Broken or damaged road divider detected. Potential hazard for traffic.",
+        },
+        {
+            "label": "Missing Sign",
+            "severity": "medium",
+            "description": "Traffic sign appears to be missing or unreadable.",
+        },
+        {
+            "label": "Other",
+            "severity": "medium",
+            "description": "Unidentified issue detected on the road.",
+        },
     ]
 
     def __init__(self, upload_dir: Optional[Path] = None) -> None:
         self.upload_dir = Path(upload_dir) if upload_dir else self.DEFAULT_UPLOAD_DIR
         self.upload_dir.mkdir(parents=True, exist_ok=True)
+        self.api_key = Config.GEMINI_API_KEY
+        self.client = None
+        if has_genai and self.api_key:
+            try:
+                self.client = genai.Client(api_key=self.api_key)
+            except Exception:
+                pass
 
     @staticmethod
     def _extension(filename: str) -> str:
@@ -111,9 +143,9 @@ class RakshaRoadModel:
             base = 0.78
         elif selected_label == "Pothole":
             base = 0.9
-        elif selected_label in {"Damaged Road", "Waterlogging"}:
+        elif selected_label in {"Damaged Road", "Waterlogging", "Broken Divider"}:
             base = 0.86
-        elif selected_label == "Surface Wear":
+        elif selected_label in {"Surface Wear", "Missing Sign", "Other"}:
             base = 0.8
 
         confidence = base + (contrast / 5000) + (brightness / 5000)
@@ -121,9 +153,77 @@ class RakshaRoadModel:
         return round(confidence, 2)
 
     def detect_pothole(self, image_path: str) -> Dict[str, Any]:
-        """Run a mock detection pass and return a structured result."""
+        """Run AI detection using Gemini Vision if configured, otherwise fallback to heuristics."""
         image = self.load_image(image_path)
-        selected = random.choice(self.DETECTION_OPTIONS)
+        
+        # Try Gemini Vision First
+        if self.client:
+            try:
+                prompt = """Analyze this image of a road or traffic environment.
+Select ONE of the following categories that best describes the main issue:
+- Pothole
+- Damaged Road
+- Waterlogging
+- Broken Divider
+- Missing Sign
+- Road Clear
+- Other
+
+Also provide a severity (critical, high, medium, low) and a short description.
+Respond strictly in JSON format:
+{
+  "label": "category name",
+  "severity": "critical/high/medium/low",
+  "description": "short description"
+}"""
+                raw_image = Image.open(image_path)
+                response = self.client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=[
+                        raw_image,
+                        prompt,
+                    ],
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                    )
+                )
+                res_data = json.loads(response.text)
+                
+                return {
+                    "label": res_data.get("label", "Other"),
+                    "confidence": 0.95,
+                    "severity": str(res_data.get("severity", "medium")).lower(),
+                    "description": res_data.get("description", "Issue detected by AI."),
+                    "bbox": None,
+                    "image_size": {
+                        "width": image.size[0],
+                        "height": image.size[1],
+                    },
+                }
+            except Exception as e:
+                print(f"Gemini API Error: {e}")
+                # Fallback on error
+                pass
+        
+        # Fallback heuristic based on filename
+        lower_name = Path(image_path).name.lower()
+        selected = None
+        
+        if "divider" in lower_name:
+            selected = next(o for o in self.DETECTION_OPTIONS if o["label"] == "Broken Divider")
+        elif "sign" in lower_name:
+            selected = next(o for o in self.DETECTION_OPTIONS if o["label"] == "Missing Sign")
+        elif "water" in lower_name or "flood" in lower_name:
+            selected = next(o for o in self.DETECTION_OPTIONS if o["label"] == "Waterlogging")
+        elif "pothole" in lower_name:
+            selected = next(o for o in self.DETECTION_OPTIONS if o["label"] == "Pothole")
+        elif "damage" in lower_name or "crack" in lower_name:
+            selected = next(o for o in self.DETECTION_OPTIONS if o["label"] == "Damaged Road")
+        elif "clear" in lower_name or "clean" in lower_name:
+            selected = next(o for o in self.DETECTION_OPTIONS if o["label"] == "Road Clear")
+        else:
+            selected = random.choice(self.DETECTION_OPTIONS)
+
         confidence = self._compute_confidence(image, selected["label"])
 
         return {

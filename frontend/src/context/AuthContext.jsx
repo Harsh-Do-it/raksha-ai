@@ -509,7 +509,7 @@ export function withAuth(Component, { role = null, redirectTo = "/" } = {}) {
           flexDirection: "column",
           gap: 12,
           fontFamily: "'DM Sans', sans-serif",
-          color: "rgba(255,255,255,0.4)",
+          color: "rgba(255,255,255,0.85)",
         }}>
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
             stroke="#dc2626" strokeWidth="1.5" strokeLinecap="round">

@@ -10,6 +10,7 @@
     "riskAlert": "Risk Alert",
     "sos": "SOS",
     "legal": "Legal Info",
+    "checkStatus": "Check Status",
     "riskAlertPlural": "Risk Alerts"
   },
   "common": {
@@ -391,6 +392,25 @@
       "licenceDesc": "Operating a motor vehicle without a valid driving licence or a learner's licence.",
       "racingTitle": "Unauthorised Racing / Trials",
       "racingDesc": "Participating in any speed contest or trial on a public road without prior written government permission."
+    }
+  },
+  "checkStatusPage": {
+    "title": "Check Status",
+    "subtitle": "Track the progress of your submitted report",
+    "placeholder": "Enter your Report ID (e.g. rep_...)",
+    "trackBtn": "Track Report",
+    "searching": "Searching...",
+    "errorNotFound": "Report ID not found or an error occurred.",
+    "reportId": "REPORT ID",
+    "dateSubmitted": "DATE SUBMITTED",
+    "adminNote": "Admin Note:",
+    "reportDetails": "Report Details",
+    "noDescription": "No description provided.",
+    "status": {
+      "pending": "Pending Review",
+      "verified": "Verified",
+      "inProgress": "In Progress",
+      "resolved": "Resolved"
     }
   }
 }

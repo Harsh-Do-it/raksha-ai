@@ -315,7 +315,7 @@ function RegisterForm({ onSuccess }) {
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round"><path d="M20 6 9 17l-5-5"/></svg>
         </div>
         <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 22, letterSpacing: 2, color: "#22c55e" }}>Account Created!</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 6 }}>Signing you in…</div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", marginTop: 6 }}>Signing you in…</div>
       </div>
     );
   }

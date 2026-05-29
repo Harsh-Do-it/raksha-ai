@@ -20,7 +20,21 @@ USERS_FILE = DATA_DIR / "users.json"
 
 # In-memory token store: {token: {user_id, role, name, email, created_at}}
 _TOKENS: Dict[str, Dict[str, Any]] = {}
+TOKENS_FILE = DATA_DIR / "tokens.json"
 _LOCK = Lock()
+
+def _load_tokens():
+    if TOKENS_FILE.exists():
+        try:
+            _TOKENS.update(json.loads(TOKENS_FILE.read_text(encoding="utf-8")))
+        except:
+            pass
+
+_load_tokens()
+
+def _save_tokens():
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    TOKENS_FILE.write_text(json.dumps(_TOKENS, indent=2), encoding="utf-8")
 
 
 def _load_users() -> Dict[str, Dict[str, Any]]:
@@ -123,7 +137,8 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
 def logout_token(token: str) -> None:
     """Invalidate a token."""
     with _LOCK:
-        _TOKENS.pop(token, None)
+        if _TOKENS.pop(token, None):
+            _save_tokens()
 
 
 def is_admin(token: str) -> bool:
@@ -144,6 +159,7 @@ def _mint_token(user_id: str, name: str, email: str, role: str) -> str:
             "role": role,
             "created_at": _now_iso(),
         }
+        _save_tokens()
     return token
 
 

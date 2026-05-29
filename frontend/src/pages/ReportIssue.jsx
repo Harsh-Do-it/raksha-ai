@@ -15,7 +15,9 @@ function PageShell({ title, subtitle, children, navigate, activeNav }) {
   const links = [
     { key:"home",labelKey:"navigation.home",path:"/" },{ key:"dashboard",labelKey:"navigation.dashboard",path:"/dashboard" },
     { key:"sos",labelKey:"navigation.sos",path:"/sos" },{ key:"report-issue",labelKey:"navigation.reportIssue",path:"/report-issue" },
-    { key:"risk-alert",labelKey:"navigation.riskAlertPlural",path:"/risk-alert" },{ key:"legal-info",labelKey:"navigation.legal",path:"/legal-info" },
+    { key:"risk-alert",labelKey:"navigation.riskAlertPlural",path:"/risk-alert" },
+    { key:"legal-info",labelKey:"navigation.legal",path:"/legal-info" },
+    { key:"status",labelKey:"navigation.checkStatus",path:"/status" },
   ];
   return (
     <div style={{ minHeight:"100vh", background:"#060810", color:"#e2e8f0", fontFamily:"'DM Sans',sans-serif", display:"flex", flexDirection:"column" }}>
@@ -26,7 +28,7 @@ function PageShell({ title, subtitle, children, navigate, activeNav }) {
             <span style={{ fontFamily:"'Bebas Neue',cursive",fontSize:15,letterSpacing:2.5,color:"#f1f5f9" }}>RAKSHA AI</span>
           </div>
           <div style={{ display:"flex",gap:2,borderLeft:"1px solid rgba(255,255,255,0.06)",paddingLeft:16 }}>
-            {links.map(l => <button key={l.key} onClick={()=>navigate(l.path)} style={{ background:activeNav===l.key?"rgba(220,38,38,0.12)":"none",border:activeNav===l.key?"1px solid rgba(220,38,38,0.25)":"1px solid transparent",borderRadius:6,cursor:"pointer",padding:"4px 11px",fontSize:11,fontWeight:500,color:activeNav===l.key?"#f87171":"rgba(255,255,255,0.4)",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",whiteSpace:"nowrap" }}>{t(l.labelKey)}</button>)}
+            {links.map(l => <button key={l.key} onClick={()=>navigate(l.path)} style={{ background:activeNav===l.key?"rgba(220,38,38,0.12)":"none",border:activeNav===l.key?"1px solid rgba(220,38,38,0.25)":"1px solid transparent",borderRadius:6,cursor:"pointer",padding:"4px 11px",fontSize:11,fontWeight:500,color:activeNav===l.key?"#f87171":"rgba(255,255,255,0.85)",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",whiteSpace:"nowrap" }}>{t(l.labelKey)}</button>)}
           </div>
         </div>
         <LanguageSelector />
@@ -60,11 +62,25 @@ const SEVERITY_LEVELS = [
 
 /* Simulated AI detection result */
 function simulateDetection(fileName) {
+  const lowerName = (fileName || "").toLowerCase();
+  
+  if (lowerName.includes("divider")) {
+    return { labelKey: "reportIssuePage.issueTypes.divider", label: "Broken Divider", confidence: 0.92, severity: "high", descriptionKey: "Broken road divider detected. Potential hazard for traffic." };
+  } else if (lowerName.includes("sign")) {
+    return { labelKey: "reportIssuePage.issueTypes.sign", label: "Missing Sign", confidence: 0.88, severity: "medium", descriptionKey: "Traffic sign appears to be missing or unreadable." };
+  } else if (lowerName.includes("water") || lowerName.includes("flood")) {
+    return { labelKey: "reportIssuePage.issueTypes.water", label: "Waterlogging", confidence: 0.91, severity: "high", descriptionKey: "reportIssuePage.simulated.water" };
+  } else if (lowerName.includes("damage") || lowerName.includes("crack")) {
+    return { labelKey: "reportIssuePage.issueTypes.damage", label: "Damaged Road", confidence: 0.87, severity: "high", descriptionKey: "reportIssuePage.simulated.damage" };
+  } else if (lowerName.includes("pothole")) {
+    return { labelKey: "reportIssuePage.issueTypes.pothole", label: "Pothole", confidence: 0.94, severity: "critical", descriptionKey: "reportIssuePage.simulated.pothole" };
+  }
+  
   const results = [
-    { labelKey:"reportIssuePage.issueTypes.pothole", confidence:0.94, severity:"critical", descriptionKey:"reportIssuePage.simulated.pothole" },
-    { labelKey:"reportIssuePage.issueTypes.damage", confidence:0.87, severity:"high", descriptionKey:"reportIssuePage.simulated.damage" },
-    { labelKey:"reportIssuePage.issueTypes.water", confidence:0.91, severity:"high", descriptionKey:"reportIssuePage.simulated.water" },
-    { labelKey:"reportIssuePage.issueTypes.damage", confidence:0.78, severity:"medium", descriptionKey:"reportIssuePage.simulated.surface" },
+    { labelKey:"reportIssuePage.issueTypes.pothole", label: "Pothole", confidence:0.94, severity:"critical", descriptionKey:"reportIssuePage.simulated.pothole" },
+    { labelKey:"reportIssuePage.issueTypes.damage", label: "Damaged Road", confidence:0.87, severity:"high", descriptionKey:"reportIssuePage.simulated.damage" },
+    { labelKey:"reportIssuePage.issueTypes.water", label: "Waterlogging", confidence:0.91, severity:"high", descriptionKey:"reportIssuePage.simulated.water" },
+    { labelKey:"reportIssuePage.issueTypes.damage", label: "Damaged Road", confidence:0.78, severity:"medium", descriptionKey:"reportIssuePage.simulated.surface" },
   ];
   return results[Math.floor(Math.random() * results.length)];
 }
@@ -94,21 +110,22 @@ export default function ReportIssue() {
     try {
       // Try real backend first; fall back to simulation if unavailable
       const det = await uploadAndDetect(file);
+      const key = det.label?.toLowerCase() || "";
+      const matchedType = ISSUE_TYPES.find(type =>
+          key.includes(type.key) || key.includes(type.label?.toLowerCase())
+      ) || ISSUE_TYPES[0];
+
       setResult({
-        labelKey: "reportIssuePage.issueTypes.pothole", // for i18n compat
+        labelKey: `reportIssuePage.issueTypes.${matchedType.key}`,
         label: det.label,
         confidence: det.confidence,
         severity: det.severity,
         description: det.description,
-        descriptionKey: "reportIssuePage.simulated.pothole",
+        descriptionKey: `reportIssuePage.simulated.${matchedType.key}`,
       });
       if (det.savedFilename) setSavedFilename(det.savedFilename);
-      const key = det.label?.toLowerCase() || "";
-      setIssueType(
-        ISSUE_TYPES.find(type =>
-          key.includes(type.key) || key.includes(type.label?.toLowerCase())
-        ) || ISSUE_TYPES[0]
-      );
+      
+      setIssueType(matchedType);
       setSeverity(det.severity || "medium");
     } catch {
       // Fallback to simulation if backend unavailable
@@ -166,7 +183,7 @@ export default function ReportIssue() {
                 Report ID: {reportId}
               </div>
             )}
-            <div style={{ fontSize:13,color:"rgba(255,255,255,0.4)",lineHeight:1.7,marginBottom:28 }}>
+            <div style={{ fontSize:13,color:"rgba(255,255,255,0.85)",lineHeight:1.7,marginBottom:28 }}>
               {t("reportIssuePage.submittedMessage")}
             </div>
             <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>

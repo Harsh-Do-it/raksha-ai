@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { labelKey: "navigation.reportIssue", path: "/report-issue" },
   { labelKey: "navigation.riskAlertPlural", path: "/risk-alert" },
   { labelKey: "navigation.legal", path: "/legal-info" },
+  { labelKey: "navigation.checkStatus", path: "/status" },
 ];
 
 const FEATURE_CARDS = [
@@ -71,9 +72,9 @@ const LIVE_STATS = [
 function ShieldLogo({ size = 52 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 52 52" fill="none">
-      <circle cx="26" cy="26" r="25" fill="#0d111b" stroke="rgba(220,38,38,0.3)" strokeWidth="1"/>
+      <circle cx="26" cy="26" r="25" fill="#0d111b" stroke="rgba(220,38,38,0.3)" strokeWidth="1" />
       <path d="M26 8 L40 15 L40 28 C40 36 26 44 26 44 C26 44 12 36 12 28 L12 15 Z"
-        fill="#dc2626" fillOpacity="0.15" stroke="#dc2626" strokeWidth="1.5" strokeLinejoin="round"/>
+        fill="#dc2626" fillOpacity="0.15" stroke="#dc2626" strokeWidth="1.5" strokeLinejoin="round" />
       <text x="26" y="32" textAnchor="middle"
         fill="#f1f5f9" fontSize="14" fontFamily="'Bebas Neue',cursive" letterSpacing="2">
         RA
@@ -114,7 +115,7 @@ function Counter({ target, duration = 1200 }) {
 function Navbar({ navigate }) {
   const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen]  = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const loggedIn = isAuthenticated();
   const admin = isAdmin();
   const user = getCurrentUser();
@@ -192,7 +193,7 @@ function Navbar({ navigate }) {
             <button onClick={handleLogout} style={{
               padding: "6px 12px", borderRadius: 7,
               background: "transparent", border: "1px solid rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.4)", fontSize: 11,
+              color: "rgba(255,255,255,0.85)", fontSize: 11,
               cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
             }}>Logout</button>
           </div>
@@ -492,7 +493,7 @@ export default function Home() {
 
         .feature-desc {
           font-size: 13px;
-          color: rgba(255,255,255,0.4);
+          color: rgba(255,255,255,0.85);
           line-height: 1.65;
         }
 
@@ -501,7 +502,7 @@ export default function Home() {
           bottom: 20px; right: 20px;
           opacity: 0;
           transition: all 0.2s;
-          color: rgba(255,255,255,0.4);
+          color: rgba(255,255,255,0.85);
         }
         .feature-card:hover .feature-arrow { opacity: 1; transform: translateX(3px); }
 
@@ -611,7 +612,7 @@ export default function Home() {
         {/* â”€â”€ Live stats strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="stats-strip">
           {LIVE_STATS.map((s, i) => (
-            <div className="stat-cell" key={s.label}
+            <div className="stat-cell" key={s.labelKey}
               style={{ animationDelay: `${i * 80}ms` }}>
               <div className="stat-value" style={{ color: s.color }}>
                 <Counter target={s.value} duration={1000 + i * 200} />
@@ -718,27 +719,22 @@ export default function Home() {
 
         {/* â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-          <div className="footer">
+          <div className="footer" style={{ position: "relative" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <ShieldLogo size={28} />
               <span style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 15, letterSpacing: 2, color: "rgba(255,255,255,0.5)" }}>
                 RAKSHA AI
               </span>
             </div>
-            <div className="footer-copy">
-              {t("home.footer")}
-            </div>
-            <div style={{ display: "flex", gap: 16 }}>
-              {["Dashboard", "SOS", "Report", "Legal"].map(l => (
-                <span key={l} style={{
-                  fontSize: 11, color: "rgba(255,255,255,0.2)",
-                  cursor: "pointer", fontFamily: "'DM Mono',monospace",
-                  transition: "color 0.15s",
-                }}
-                  onMouseEnter={e => e.target.style.color = "rgba(255,255,255,0.5)"}
-                  onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.2)"}
-                >{l}</span>
-              ))}
+            <div style={{
+              position: "absolute",
+              left: "50%",
+              transform: "translateX(-50%)",
+              fontSize: 12,
+              color: "rgba(255, 255, 255, 0.78)",
+              fontFamily: "'DM Mono',monospace"
+            }}>
+              Built for India
             </div>
           </div>
         </div>

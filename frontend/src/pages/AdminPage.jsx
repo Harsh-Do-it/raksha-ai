@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, isAdmin, logout } from "../services/authService";
-import { getIssues, updateIssueStatus, deleteIssue } from "../services/roadService";
+import { getIssues, updateIssueStatus, deleteIssue, getSosAlerts, deleteSosAlert } from "../services/roadService";
 
 const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || "http://127.0.0.1:5000";
 
@@ -196,17 +196,17 @@ function IssueRow({ issue, onStatusChange, onDelete, updating }) {
               {/* Reporter info */}
               <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 10 }}>
                 <div style={{ fontSize: 10, fontFamily: "'DM Mono',monospace", color: "rgba(255,255,255,0.25)" }}>
-                  <span style={{ color: "rgba(255,255,255,0.4)" }}>Reporter</span><br />
+                  <span style={{ color: "rgba(255,255,255,0.85)" }}>Reporter</span><br />
                   {issue.reporter_name || "Anonymous"}
                 </div>
                 {issue.area && (
                   <div style={{ fontSize: 10, fontFamily: "'DM Mono',monospace", color: "rgba(255,255,255,0.25)" }}>
-                    <span style={{ color: "rgba(255,255,255,0.4)" }}>Area</span><br />
+                    <span style={{ color: "rgba(255,255,255,0.85)" }}>Area</span><br />
                     {issue.area}
                   </div>
                 )}
                 <div style={{ fontSize: 10, fontFamily: "'DM Mono',monospace", color: "rgba(255,255,255,0.25)" }}>
-                  <span style={{ color: "rgba(255,255,255,0.4)" }}>Submitted</span><br />
+                  <span style={{ color: "rgba(255,255,255,0.85)" }}>Submitted</span><br />
                   {timeAgo(issue.created_at)}
                 </div>
               </div>
@@ -279,6 +279,8 @@ function IssueRow({ issue, onStatusChange, onDelete, updating }) {
 export default function AdminPage() {
   const navigate = useNavigate();
   const [issues, setIssues] = useState([]);
+  const [sosList, setSosList] = useState([]);
+  const [activeTab, setActiveTab] = useState("issues");
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(null);
@@ -300,11 +302,17 @@ export default function AdminPage() {
       const opts = {};
       if (filters.status !== "all")   opts.status   = filters.status;
       if (filters.severity !== "all") opts.severity = filters.severity;
-      const data = await getIssues({ ...opts, limit: 100 });
-      setIssues(data.items || []);
-      setTotal(data.total || 0);
+      
+      const [issuesData, sosData] = await Promise.all([
+        getIssues({ ...opts, limit: 100 }),
+        getSosAlerts({ limit: 50 })
+      ]);
+      
+      setIssues(issuesData.items || []);
+      setTotal(issuesData.total || 0);
+      setSosList(sosData.items || []);
     } catch (err) {
-      showToast("Failed to load issues: " + err.message, "error");
+      showToast("Failed to load data: " + err.message, "error");
     } finally {
       setLoading(false);
     }
@@ -338,6 +346,20 @@ export default function AdminPage() {
       setIssues(prev => prev.filter(i => i.id !== id));
       setTotal(t => t - 1);
       showToast("Report deleted.");
+    } catch (err) {
+      showToast("Delete failed: " + err.message, "error");
+    } finally {
+      setUpdating(null);
+    }
+  }
+
+  async function handleSosDelete(id) {
+    if (!window.confirm("Delete this SOS alert permanently?")) return;
+    setUpdating(id);
+    try {
+      await deleteSosAlert(id);
+      setSosList(prev => prev.filter(s => (s.alert_id || s.id) !== id));
+      showToast("SOS alert deleted.");
     } catch (err) {
       showToast("Delete failed: " + err.message, "error");
     } finally {
@@ -415,65 +437,137 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Stats row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px,1fr))", gap: 10, marginBottom: 24 }}>
-            <StatCard label="Total Reports" value={total} color="#3b82f6" />
-            <StatCard label="Pending" value={byStatus.pending || 0} color="#f97316" />
-            <StatCard label="Verified" value={byStatus.verified || 0} color="#3b82f6" />
-            <StatCard label="In Progress" value={byStatus["in-progress"] || 0} color="#eab308" />
-            <StatCard label="Resolved" value={byStatus.resolved || 0} color="#22c55e" />
-            <StatCard label="Critical" value={bySev.critical || 0} color="#dc2626" />
-          </div>
-
-          {/* Filter + refresh */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
-            <FilterBar filters={filters} setFilters={setFilters} />
-            <button onClick={fetchIssues} disabled={loading} style={{
-              padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)",
-              background: "transparent", color: "rgba(255,255,255,0.5)", fontSize: 12,
-              cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-              display: "flex", alignItems: "center", gap: 6,
-            }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: loading ? "spin 1s linear infinite" : "none" }}>
-                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-              </svg>
-              {loading ? "Refreshing…" : "Refresh"}
+          {/* Tabs */}
+          <div style={{ display: "flex", gap: 12, marginBottom: 24, borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 12 }}>
+            <button 
+              onClick={() => setActiveTab("issues")}
+              style={{
+                background: "transparent", border: "none", color: activeTab === "issues" ? "#f1f5f9" : "rgba(255,255,255,0.4)",
+                fontSize: 16, fontFamily: "'Bebas Neue',cursive", letterSpacing: 2, cursor: "pointer",
+                padding: "4px 12px", borderBottom: activeTab === "issues" ? "2px solid #dc2626" : "2px solid transparent", transition: "all 0.2s"
+              }}>
+              REPORTED ISSUES
+            </button>
+            <button 
+              onClick={() => setActiveTab("sos")}
+              style={{
+                background: "transparent", border: "none", color: activeTab === "sos" ? "#f1f5f9" : "rgba(255,255,255,0.4)",
+                fontSize: 16, fontFamily: "'Bebas Neue',cursive", letterSpacing: 2, cursor: "pointer",
+                padding: "4px 12px", borderBottom: activeTab === "sos" ? "2px solid #dc2626" : "2px solid transparent", transition: "all 0.2s"
+              }}>
+              SOS ALERTS
             </button>
           </div>
 
-          {/* Issues list */}
-          {loading && issues.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,0.25)" }}>
-              <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 18, letterSpacing: 2 }}>Loading Reports…</div>
-            </div>
-          ) : issues.length === 0 ? (
-            <div style={{
-              textAlign: "center", padding: "80px 0",
-              border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 14,
-            }}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeLinecap="round" style={{ marginBottom: 16 }}>
-                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/>
-              </svg>
-              <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 20, letterSpacing: 2, color: "rgba(255,255,255,0.25)" }}>No Reports Found</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.2)", marginTop: 6 }}>
-                {filters.status !== "all" || filters.severity !== "all" ? "Try clearing filters" : "No issues have been reported yet"}
+          {activeTab === "issues" ? (
+            <>
+              {/* Stats row */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px,1fr))", gap: 10, marginBottom: 24 }}>
+                <StatCard label="Total Reports" value={total} color="#3b82f6" />
+                <StatCard label="Pending" value={byStatus.pending || 0} color="#f97316" />
+                <StatCard label="Verified" value={byStatus.verified || 0} color="#3b82f6" />
+                <StatCard label="In Progress" value={byStatus["in-progress"] || 0} color="#eab308" />
+                <StatCard label="Resolved" value={byStatus.resolved || 0} color="#22c55e" />
+                <StatCard label="Critical" value={bySev.critical || 0} color="#dc2626" />
               </div>
-            </div>
+
+              {/* Filter + refresh */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+                <FilterBar filters={filters} setFilters={setFilters} />
+                <button onClick={fetchIssues} disabled={loading} style={{
+                  padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)",
+                  background: "transparent", color: "rgba(255,255,255,0.5)", fontSize: 12,
+                  cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: loading ? "spin 1s linear infinite" : "none" }}>
+                    <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                  </svg>
+                  {loading ? "Refreshing…" : "Refresh"}
+                </button>
+              </div>
+
+              {/* Issues list */}
+              {loading && issues.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,0.25)" }}>
+                  <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 18, letterSpacing: 2 }}>Loading Reports…</div>
+                </div>
+              ) : issues.length === 0 ? (
+                <div style={{
+                  textAlign: "center", padding: "80px 0",
+                  border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 14,
+                }}>
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeLinecap="round" style={{ marginBottom: 16 }}>
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/>
+                  </svg>
+                  <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 20, letterSpacing: 2, color: "rgba(255,255,255,0.25)" }}>No Reports Found</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.2)", marginTop: 6 }}>
+                    {filters.status !== "all" || filters.severity !== "all" ? "Try clearing filters" : "No issues have been reported yet"}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ fontSize: 10, fontFamily: "'DM Mono',monospace", color: "rgba(255,255,255,0.2)", marginBottom: 12, letterSpacing: 1 }}>
+                    SHOWING {issues.length} OF {total} REPORTS
+                  </div>
+                  {issues.map(issue => (
+                    <IssueRow
+                      key={issue.id}
+                      issue={issue}
+                      onStatusChange={handleStatusChange}
+                      onDelete={handleDelete}
+                      updating={updating}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           ) : (
-            <div>
-              <div style={{ fontSize: 10, fontFamily: "'DM Mono',monospace", color: "rgba(255,255,255,0.2)", marginBottom: 12, letterSpacing: 1 }}>
-                SHOWING {issues.length} OF {total} REPORTS
-              </div>
-              {issues.map(issue => (
-                <IssueRow
-                  key={issue.id}
-                  issue={issue}
-                  onStatusChange={handleStatusChange}
-                  onDelete={handleDelete}
-                  updating={updating}
-                />
-              ))}
-            </div>
+            <>
+              {/* SOS list */}
+              {loading && sosList.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,0.25)" }}>
+                  <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 18, letterSpacing: 2 }}>Loading SOS Alerts…</div>
+                </div>
+              ) : sosList.length === 0 ? (
+                <div style={{
+                  textAlign: "center", padding: "80px 0",
+                  border: "1px dashed rgba(255,255,255,0.08)", borderRadius: 14,
+                }}>
+                  <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 20, letterSpacing: 2, color: "rgba(255,255,255,0.25)" }}>No SOS Alerts</div>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ fontSize: 10, fontFamily: "'DM Mono',monospace", color: "rgba(255,255,255,0.2)", marginBottom: 12, letterSpacing: 1 }}>
+                    {sosList.length} ACTIVE SOS ALERTS
+                  </div>
+                  {sosList.map(sos => (
+                    <div key={sos.alert_id || sos.id} style={{ background: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 12, padding: 16, marginBottom: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                            <div style={{ padding: "4px 8px", background: "#dc2626", color: "white", fontSize: 10, fontFamily: "'DM Mono',monospace", borderRadius: 4, fontWeight: "bold" }}>SOS ALERT</div>
+                            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontFamily: "'DM Mono',monospace" }}>{new Date(sos.timestamp || sos.created_at).toLocaleString()}</div>
+                          </div>
+                          <div style={{ fontSize: 14, color: "#f1f5f9", marginBottom: 4 }}><strong>Location:</strong> {sos.location ? (typeof sos.location === 'object' ? `Lat: ${sos.location.lat}, Lng: ${sos.location.lng}` : sos.location) : "Unknown"}</div>
+                          <div style={{ fontSize: 14, color: "#f1f5f9" }}><strong>Device / Ref:</strong> {sos.user_id || "Unknown"}</div>
+                        </div>
+                        <button onClick={() => handleSosDelete(sos.alert_id || sos.id)}
+                          disabled={updating === (sos.alert_id || sos.id)}
+                          style={{
+                            padding: "8px 16px", borderRadius: 8, border: "1px solid rgba(220,38,38,0.25)",
+                            background: "rgba(220,38,38,0.08)", color: "#f87171",
+                            fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans',sans-serif",
+                            cursor: "pointer", transition: "all 0.15s", flexShrink: 0,
+                          }}>
+                          {updating === (sos.alert_id || sos.id) ? "Deleting..." : "Resolve & Delete"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

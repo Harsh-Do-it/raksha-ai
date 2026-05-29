@@ -26,6 +26,7 @@ from services.reports_service import (
     create_report, get_reports, get_report_by_id,
     update_report_status, delete_report, get_stats,
 )
+from services.sos_service import save_sos_alert, get_sos_alerts, delete_sos_alert
 
 
 def create_app() -> Flask:
@@ -600,7 +601,24 @@ def sos_activate():
         note=payload.get("note", ""),
         device_info=payload.get("device_info"),
     )
+    if result.get("alert"):
+        save_sos_alert(result["alert"])
     return jsonify(result)
+
+
+@app.route("/sos/alerts", methods=["GET"])
+def list_sos_alerts():
+    limit = request.args.get("limit", default=50, type=int)
+    offset = request.args.get("offset", default=0, type=int)
+    return jsonify(get_sos_alerts(limit=limit, offset=offset))
+
+
+@app.route("/sos/alerts/<alert_id>", methods=["DELETE"])
+def remove_sos_alert(alert_id):
+    deleted = delete_sos_alert(alert_id)
+    if deleted:
+        return jsonify({"message": "Alert deleted successfully"}), 200
+    return jsonify({"error": "Alert not found"}), 404
 
 
 # Also support /sos for frontend compatibility

@@ -1,0 +1,92 @@
+===============================
+        RAKSHA AI SOS ALERT
+===============================
+
+User: Raksha AI User
+Time: 2026-05-29T10:06:27+00:00
+Status: Possible road accident detected
+
+Location Details:
+City: Unknown
+Region: Unknown
+Country: Unknown
+Coordinates: 28.96765, 77.67686
+Accuracy: N/A
+Source: fallback
+
+Emergency contacts: 0
+Note: No additional note provided
+
+
+Immediate assistance may be required.
+
+
+===============================
+        RAKSHA AI SOS ALERT
+===============================
+
+User: Raksha AI User
+Time: 2026-05-29T12:14:14+00:00
+Status: Possible road accident detected
+
+Location Details:
+City: Dehradun
+Region: Uttarakhand
+Country: IN
+Coordinates: 30.3244, 78.0339
+Accuracy: N/A
+Source: ipinfo
+
+Emergency contacts: 0
+Note: No additional note provided
+
+
+Immediate assistance may be required.
+
+
+===============================
+        RAKSHA AI SOS ALERT
+===============================
+
+User: Raksha AI User
+Time: 2026-05-29T12:27:42+00:00
+Status: Possible road accident detected
+
+Location Details:
+City: Dehradun
+Region: Uttarakhand
+Country: IN
+Coordinates: 30.3244, 78.0339
+Accuracy: N/A
+Source: ipinfo
+
+Emergency contacts: 0
+Note: test
+
+
+Immediate assistance may be required.
+
+
+===============================
+        RAKSHA AI SOS ALERT
+===============================
+
+User: Raksha AI User
+Time: 2026-05-29T12:30:40+00:00
+Status: Possible road accident detected
+
+Location Details:
+City: Unknown
+Region: Unknown
+Country: Unknown
+Coordinates: 28.96767, 77.67666
+Accuracy: N/A
+Source: fallback
+
+Emergency contacts: 0
+Note: Emergency from SOS Page
+
+
+Immediate assistance may be required.
+
+

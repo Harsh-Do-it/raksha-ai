@@ -7,6 +7,7 @@ import SOSPage from './pages/SOSPage';
 import LegalInfo from './pages/LegalInfo';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
+import CheckStatus from './pages/CheckStatus';
 import { LanguageProvider } from './context/LanguageContext';
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/risk-alert" element={<RiskAlert />} />
         <Route path="/sos" element={<SOSPage />} />
         <Route path="/legal-info" element={<LegalInfo />} />
+        <Route path="/status" element={<CheckStatus />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<Home />} />

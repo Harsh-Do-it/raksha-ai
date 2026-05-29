@@ -19,8 +19,8 @@
 import { getAuthToken } from "./authService";
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const BASE_URL       = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000";
-const USE_MOCK       = process.env.REACT_APP_USE_MOCK === "true" || process.env.NODE_ENV === "development";
+const BASE_URL       = import.meta.env.VITE_APP_API_BASE_URL || "http://127.0.0.1:5000";
+const USE_MOCK       = import.meta.env.VITE_APP_USE_MOCK === "true";
 const SOS_TIMEOUT_MS = 8000;   // 8 s hard timeout on emergency requests
 const MAX_RETRIES    = 3;       // retry up to 3× before giving up
 const RETRY_DELAY_MS = 1200;   // delay between retries
@@ -214,7 +214,7 @@ export async function sendSOS({
 
   if (USE_MOCK) return mockSendSOS(payload);
 
-  return fetchWithRetry(`${BASE_URL}/sos`, {
+  return fetchWithRetry(`${BASE_URL}/sos/activate`, {
     method: "POST",
     body:   JSON.stringify(payload),
   });

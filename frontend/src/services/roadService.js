@@ -69,6 +69,28 @@ export async function submitIssue(issue) {
 
 // ── Fetch issues list ─────────────────────────────────────────────────────────
 
+export async function getSosAlerts({ limit = 50, offset = 0 } = {}) {
+  if (USE_MOCK) {
+    await sleep(500);
+    return { total: 0, items: [] };
+  }
+  const params = new URLSearchParams();
+  params.set("limit", limit);
+  params.set("offset", offset);
+
+  return apiFetch(`/sos/alerts?${params.toString()}`);
+}
+
+export async function deleteSosAlert(alertId) {
+  if (USE_MOCK) {
+    await sleep(400);
+    return { success: true };
+  }
+  return apiFetch(`/sos/alerts/${alertId}`, {
+    method: "DELETE",
+  });
+}
+
 export async function getIssues({ status, severity, type, limit = 20, offset = 0 } = {}) {
   if (USE_MOCK) {
     await sleep(500);
@@ -94,6 +116,14 @@ export async function updateIssueStatus(reportId, newStatus, adminNote = "") {
 }
 
 // ── Admin: delete issue ────────────────────────────────────────────────────────
+
+export async function getIssueById(reportId) {
+  if (USE_MOCK) {
+    await sleep(400);
+    return { id: reportId, status: "pending", description: "Mock issue." };
+  }
+  return apiFetch(`/roads/issues/${reportId}`);
+}
 
 export async function deleteIssue(reportId) {
   return apiFetch(`/roads/issues/${reportId}`, { method: "DELETE" });

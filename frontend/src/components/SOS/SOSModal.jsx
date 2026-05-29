@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { sendSOS } from "../../services/sosService";
 
 /**
  * SOSModal — emergency alert flow for Raksha AI
@@ -86,15 +87,28 @@ export default function SOSModal({ onClose, onAlertSent }) {
     );
   }
 
-  // ── Stage: sending — simulate API call ──
+  // ── Stage: sending — API call ──
   useEffect(() => {
     if (stage !== "sending") return;
-    const t = setTimeout(() => {
-      setStage("sent");
-      onAlertSent?.({ location, hospitals: MOCK_HOSPITALS, eta: MOCK_ETA });
-    }, 1800);
-    return () => clearTimeout(t);
-  }, [stage]);
+    let isMounted = true;
+    
+    async function doSend() {
+      try {
+        const payload = await sendSOS({ location, note: "Emergency from web" });
+        if (!isMounted) return;
+        setStage("sent");
+        onAlertSent?.(payload);
+      } catch (err) {
+        if (!isMounted) return;
+        console.error("SOS failed", err);
+        setStage("sent"); 
+        onAlertSent?.({ location, hospitals: MOCK_HOSPITALS, eta: MOCK_ETA, error: true });
+      }
+    }
+    
+    doSend();
+    return () => { isMounted = false; };
+  }, [stage, location, onAlertSent]);
 
   // Escape key closes
   useEffect(() => {
@@ -342,7 +356,7 @@ export default function SOSModal({ onClose, onAlertSent }) {
 
         .sm-loader-sub {
           font-size: 13px;
-          color: rgba(255,255,255,0.4);
+          color: rgba(255,255,255,0.85);
         }
 
         .sm-signal {

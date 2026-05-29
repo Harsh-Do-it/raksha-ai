@@ -1,4 +1,4 @@
-﻿import random
+import random
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
@@ -194,6 +194,7 @@ class RakshaAISOS:
         user_id: Optional[str] = None,
         note: str = "",
         device_info: Optional[Dict[str, Any]] = None,
+        force: bool = True,
     ) -> Dict[str, Any]:
         """Run the complete SOS workflow and return a structured response."""
         self.location = location or self.location or self.get_live_location()
@@ -203,7 +204,7 @@ class RakshaAISOS:
 
         detection = self.detect_accident()
 
-        if not detection["detected"]:
+        if not force and not detection["detected"]:
             return {
                 "status": "safe",
                 "message": "System operating normally.",

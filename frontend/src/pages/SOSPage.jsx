@@ -1,13 +1,13 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "../components/LanguageSelector";
+import { sendSOS } from "../services/sosService";
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   SOSPage.jsx â€” Emergency SOS activation page
+/* ─────────────────────────────────────────────────────────────
+   SOSPage.jsx — Emergency SOS activation page
    Full-page emergency command interface
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+   ───────────────────────────────────────────────────────────── */
 
 /* PageShell re-export (shared across pages) */
 function PageShell({ title, subtitle, children, navigate, activeNav }) {
@@ -19,6 +19,7 @@ function PageShell({ title, subtitle, children, navigate, activeNav }) {
     { key: "report-issue", labelKey: "navigation.reportIssue", path: "/report-issue" },
     { key: "risk-alert", labelKey: "navigation.riskAlertPlural", path: "/risk-alert" },
     { key: "legal-info", labelKey: "navigation.legal", path: "/legal-info" },
+    { key: "status", labelKey: "navigation.checkStatus", path: "/status" },
   ];
   return (
     <div style={{ minHeight:"100vh", background:"#060810", color:"#e2e8f0", fontFamily:"'DM Sans',sans-serif", display:"flex", flexDirection:"column" }}>
@@ -34,7 +35,7 @@ function PageShell({ title, subtitle, children, navigate, activeNav }) {
           </div>
           <div style={{ display:"flex", gap:2, borderLeft:"1px solid rgba(255,255,255,0.06)", paddingLeft:16 }}>
             {links.map(l => (
-              <button key={l.key} onClick={() => navigate(l.path)} style={{ background:activeNav===l.key?"rgba(220,38,38,0.12)":"none", border:activeNav===l.key?"1px solid rgba(220,38,38,0.25)":"1px solid transparent", borderRadius:6, cursor:"pointer", padding:"4px 11px", fontSize:11, fontWeight:500, color:activeNav===l.key?"#f87171":"rgba(255,255,255,0.4)", fontFamily:"'DM Sans',sans-serif", transition:"all 0.15s", whiteSpace:"nowrap" }}>{t(l.labelKey)}</button>
+              <button key={l.key} onClick={() => navigate(l.path)} style={{ background:activeNav===l.key?"rgba(220,38,38,0.12)":"none", border:activeNav===l.key?"1px solid rgba(220,38,38,0.25)":"1px solid transparent", borderRadius:6, cursor:"pointer", padding:"4px 11px", fontSize:11, fontWeight:500, color:activeNav===l.key?"#f87171":"rgba(255,255,255,0.85)", fontFamily:"'DM Sans',sans-serif", transition:"all 0.15s", whiteSpace:"nowrap" }}>{t(l.labelKey)}</button>
             ))}
           </div>
         </div>
@@ -106,7 +107,7 @@ const CONTACTS = [
   { name: "Road Helpline", num: "1033", icon: "M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7", color:"#22c55e" },
 ];
 
-/* â”€â”€ Main SOSPage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Main SOSPage ──────────────────────────────────────────────── */
 export default function SOSPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -114,13 +115,35 @@ export default function SOSPage() {
   const [location, setLocation] = useState(null);
   const [stage, setStage] = useState("idle"); // idle | locating | dispatched
 
-  function handleActivate() {
+  async function handleActivate() {
     setStage("locating");
-    navigator.geolocation?.getCurrentPosition(
-      pos => setLocation({ lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) }),
-      () => setLocation({ lat: "28.61390", lng: "77.20900" })
-    );
-    setTimeout(() => { setStage("dispatched"); setActivated(true); }, 2200);
+    
+    // Default location
+    let locObj = { lat: "28.61390", lng: "77.20900" };
+    
+    // Try to get actual location
+    if (navigator.geolocation) {
+      try {
+        const pos = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 6000 });
+        });
+        locObj = { lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) };
+        setLocation(locObj);
+      } catch (err) {
+        setLocation(locObj);
+      }
+    } else {
+      setLocation(locObj);
+    }
+
+    try {
+      await sendSOS({ location: locObj, note: "Emergency from SOS Page" });
+    } catch (err) {
+      console.error("SOS call failed", err);
+    }
+    
+    setStage("dispatched");
+    setActivated(true);
   }
 
   return (
@@ -130,7 +153,7 @@ export default function SOSPage() {
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, maxWidth:900, margin:"0 auto" }}>
 
-          {/* â”€â”€ Left: SOS button + status â”€â”€ */}
+          {/* ── Left: SOS button + status ── */}
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:24 }}>
 
             {/* Status bar */}
@@ -153,7 +176,7 @@ export default function SOSPage() {
                   <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round"><path d="M20 6 9 17l-5-5"/></svg>
                 </div>
                 <div style={{ fontFamily:"'Bebas Neue',cursive", fontSize:28, letterSpacing:2, color:"#22c55e", marginBottom:6 }}>{t("sosPage.alertSent")}</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)", fontFamily:"'DM Mono',monospace" }}>
+                <div style={{ fontSize:12, color:"rgba(255,255,255,0.85)", fontFamily:"'DM Mono',monospace" }}>
                   {t("sosPage.servicesEta")}
                 </div>
                 <button onClick={() => { setActivated(false); setStage("idle"); }} style={{ marginTop:20, padding:"8px 20px", borderRadius:8, border:"1px solid rgba(255,255,255,0.1)", background:"transparent", color:"rgba(255,255,255,0.5)", fontSize:12, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>{t("sosPage.reset")}</button>
@@ -169,12 +192,12 @@ export default function SOSPage() {
             {location && (
               <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", borderRadius:9, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", fontSize:12, color:"rgba(255,255,255,0.5)", fontFamily:"'DM Mono',monospace", width:"100%" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.8" strokeLinecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
-                {location.lat}Â°N, {location.lng}Â°E
+                {location.lat}°N, {location.lng}°E
               </div>
             )}
           </div>
 
-          {/* â”€â”€ Right: Emergency contacts + info â”€â”€ */}
+          {/* ── Right: Emergency contacts + info ── */}
           <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
 
             {/* Emergency numbers */}

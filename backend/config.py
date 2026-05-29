@@ -1,7 +1,11 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent
+# Look for .env in the root directory (parent of backend)
+load_dotenv(BASE_DIR.parent / ".env")
 
 
 class Config:
@@ -16,3 +20,4 @@ class Config:
     FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID")
     FIREBASE_DATABASE_URL = os.getenv("FIREBASE_DATABASE_URL")
     FIREBASE_SERVICE_ACCOUNT_PATH = os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")

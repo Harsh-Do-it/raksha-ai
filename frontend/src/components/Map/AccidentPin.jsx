@@ -187,7 +187,7 @@ function AccidentPopup({ accident, onClose }) {
         {accident.time && (
           <div style={{
             display: "flex", alignItems: "center", gap: 6,
-            fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 10,
+            fontSize: 12, color: "rgba(255,255,255,0.85)", marginBottom: 10,
           }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="2" strokeLinecap="round">

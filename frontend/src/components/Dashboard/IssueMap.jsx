@@ -377,7 +377,7 @@ export default function IssueMap({
           cursor: pointer;
           border: 1px solid rgba(255,255,255,0.08);
           background: rgba(255,255,255,0.03);
-          color: rgba(255,255,255,0.4);
+          color: rgba(255,255,255,0.85);
           transition: all 0.15s;
           flex-shrink: 0;
         }

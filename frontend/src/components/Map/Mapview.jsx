@@ -318,7 +318,7 @@ export default function MapView({
           justify-content: center;
           gap: 12px;
           background: #0d0d14;
-          color: rgba(255,255,255,0.4);
+          color: rgba(255,255,255,0.85);
           font-size: 14px;
           letter-spacing: 0.3px;
         }
@@ -519,7 +519,7 @@ export default function MapView({
               <LayerToggle
                 label={mapType === "roadmap" ? "Satellite" : "Map"}
                 active={false}
-                color="rgba(255,255,255,0.4)"
+                color="rgba(255,255,255,0.85)"
                 onClick={() => setMapType(t => t === "roadmap" ? "satellite" : "roadmap")}
               />
             </div>
