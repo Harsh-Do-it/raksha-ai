@@ -90,3 +90,49 @@ Note: Emergency from SOS Page
 Immediate assistance may be required.
 
 
+===============================
+        RAKSHA AI SOS ALERT
+===============================
+
+User: Raksha AI User
+Time: 2026-05-29T18:17:08+00:00
+Status: Possible road accident detected
+
+Location Details:
+City: Unknown
+Region: Unknown
+Country: Unknown
+Coordinates: 28.96751, 77.67673
+Accuracy: N/A
+Source: fallback
+
+Emergency contacts: 0
+Note: Emergency from SOS Page
+
+
+Immediate assistance may be required.
+
+
+===============================
+        RAKSHA AI SOS ALERT
+===============================
+
+User: Raksha AI User
+Time: 2026-05-29T18:19:44+00:00
+Status: Possible road accident detected
+
+Location Details:
+City: Unknown
+Region: Unknown
+Country: Unknown
+Coordinates: 28.96754, 77.67672
+Accuracy: N/A
+Source: fallback
+
+Emergency contacts: 0
+Note: Emergency from SOS Page
+
+
+Immediate assistance may be required.
+
+
