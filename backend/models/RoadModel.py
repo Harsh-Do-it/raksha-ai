@@ -159,49 +159,58 @@ class RakshaRoadModel:
         # Try Gemini Vision First
         if self.client:
             try:
-                prompt = """Analyze this image of a road or traffic environment.
-Select ONE of the following categories that best describes the main issue:
-- Pothole
-- Damaged Road
+                prompt = """Analyze this image of a road or traffic environment in detail.
+Carefully distinguish between the following categories:
+- Pothole (distinct, localized holes or craters in the road surface)
+- Damaged Road (general surface cracking, subsidence, unpaved roughness, or broad deterioration without distinct deep holes)
 - Waterlogging
 - Broken Divider
 - Missing Sign
 - Road Clear
 - Other
 
-Also provide a severity (critical, high, medium, low) and a short description.
+Select ONE category that best describes the main issue. If there are distinct holes, prioritize 'Pothole'.
+Provide a severity (critical, high, medium, low) based on the hazard level.
+Provide a detailed description of the issue in a natural, human-like, conversational tone. Describe exactly what you see in the image as if you are reporting it yourself to the authorities, and explain the potential danger to vehicles and the recommended urgency of repair.
+
 Respond strictly in JSON format:
 {
   "label": "category name",
   "severity": "critical/high/medium/low",
-  "description": "short description"
+  "description": "natural, human-like description of the issue"
 }"""
+                import time
+                res_data = None
                 raw_image = Image.open(image_path)
-                response = self.client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=[
-                        raw_image,
-                        prompt,
-                    ],
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                    )
-                )
-                res_data = json.loads(response.text)
+                for _ in range(3):
+                    try:
+                        response = self.client.models.generate_content(
+                            model='gemini-2.5-flash',
+                            contents=[raw_image, prompt],
+                            config=types.GenerateContentConfig(response_mime_type="application/json")
+                        )
+                        res_data = json.loads(response.text)
+                        break
+                    except Exception as e:
+                        print(f"Gemini API Error during retry: {e}")
+                        time.sleep(1.5)
                 
-                return {
-                    "label": res_data.get("label", "Other"),
-                    "confidence": 0.95,
-                    "severity": str(res_data.get("severity", "medium")).lower(),
-                    "description": res_data.get("description", "Issue detected by AI."),
-                    "bbox": None,
-                    "image_size": {
-                        "width": image.size[0],
-                        "height": image.size[1],
-                    },
-                }
+                if res_data:
+                    return {
+                        "label": res_data.get("label", "Other"),
+                        "confidence": 0.95,
+                        "severity": str(res_data.get("severity", "medium")).lower(),
+                        "description": res_data.get("description", "Issue detected by AI."),
+                        "bbox": None,
+                        "image_size": {
+                            "width": image.size[0],
+                            "height": image.size[1],
+                        },
+                    }
+                else:
+                    print("All 3 retries failed for Gemini API.")
             except Exception as e:
-                print(f"Gemini API Error: {e}")
+                print(f"Gemini Processing Error: {e}")
                 # Fallback on error
                 pass
         

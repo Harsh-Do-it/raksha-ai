@@ -127,6 +127,7 @@ export default function ReportIssue() {
       
       setIssueType(matchedType);
       setSeverity(det.severity || "medium");
+      setDesc(det.description || t(`reportIssuePage.simulated.${matchedType.key}`));
     } catch {
       // Fallback to simulation if backend unavailable
       const det = simulateDetection(file.name);
@@ -137,6 +138,7 @@ export default function ReportIssue() {
         ) || ISSUE_TYPES[0]
       );
       setSeverity(det.severity);
+      setDesc(t(det.descriptionKey));
     } finally {
       setDetecting(false);
     }

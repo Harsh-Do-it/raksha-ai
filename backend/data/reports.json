@@ -1,68 +1,207 @@
-{
-  "id": "RPT-1780052167434-579D14",
-
-  "issue": {
-    "type": "Pothole",
-    "category": "Road Damage",
+[
+  {
+    "id": "RPT-1780078870052-1E0A68",
+    "type": "Damaged Road",
     "severity": "critical",
-    "description": "Large pothole causing traffic disruption and safety risk."
+    "road": "noida sector 9",
+    "area": "greater noida",
+    "description": "Oh wow, this road is in absolutely terrible condition. It looks like it's been through a major event, possibly an earthquake or significant ground movement. The asphalt is completely torn apart, with huge, jagged cracks running across the entire width of the road. There's significant subsidence, meaning large sections of the road surface have collapsed downwards, while other parts appear uplifted, creating severe height differences and large steps in the pavement. The road is broken into massive chunks, and you can see deep fissures where the ground has split open. Even the yellow lane line is severely distorted and broken. This road is clearly impassable for any vehicle and poses an extreme hazard. It needs immediate closure and urgent, extensive repair work, likely involving a complete reconstruction of the affected sections, before any traffic can even think about using it again. It's a critical safety concern.",
+    "ai_label": "Damaged Road",
+    "ai_confidence": 0.95,
+    "image_filename": "download.jpg",
+    "lat": null,
+    "lng": null,
+    "reporter_name": "harsh",
+    "reporter_id": "user-102107067c",
+    "status": "resolved",
+    "created_at": "2026-05-29T18:21:10+00:00",
+    "updated_at": "2026-05-29T18:22:12+00:00",
+    "admin_note": ""
   },
-
-  "location": {
-    "road": "Yamuna Expressway",
-    "area": "Noida",
-    "district": "Gautam Buddha Nagar",
-    "state": "Uttar Pradesh",
-    "pincode": null,
-    "lat": 28.5355,
-    "lng": 77.3910
+  {
+    "id": "RPT-1780053047442-9B3A7C",
+    "type": "Missing Sign",
+    "severity": "low",
+    "road": "highway",
+    "area": "delhi",
+    "description": "missing sign of strict u-turn ahead",
+    "ai_label": null,
+    "ai_confidence": null,
+    "image_filename": null,
+    "lat": null,
+    "lng": null,
+    "reporter_name": "Anonymous",
+    "reporter_id": null,
+    "status": "resolved",
+    "created_at": "2026-05-29T11:10:47+00:00",
+    "updated_at": "2026-05-29T11:27:42+00:00",
+    "admin_note": ""
   },
-
-  "reporter": {
-    "name": "Anonymous",
-    "id": null,
-    "contact": null
-  },
-
-  "ai_analysis": {
-    "label": "Pothole",
-    "confidence": 0.95,
-    "model_version": "v1.2",
-    "risk_score": 92,
-    "verified": true
-  },
-
-  "media": {
-    "images": [
-      "download (1).jpg"
-    ],
-    "video": null
-  },
-
-  "workflow": {
+  {
+    "id": "RPT-1780052420613-486050",
+    "type": "Waterlogging",
+    "severity": "high",
+    "road": "modinagar",
+    "area": "meerut",
+    "description": "",
+    "ai_label": "Waterlogging",
+    "ai_confidence": 0.91,
+    "image_filename": "vehicles-try-driving-citizens-walking-through-water-440nw-14118336a.jpg",
+    "lat": null,
+    "lng": null,
+    "reporter_name": "Anonymous",
+    "reporter_id": null,
     "status": "pending",
-    "assigned_department": "PWD",
-    "assigned_officer": null,
-    "priority_rank": 1,
-    "escalation_level": 0
+    "created_at": "2026-05-29T11:00:20+00:00",
+    "updated_at": "2026-05-29T11:00:20+00:00",
+    "admin_note": ""
   },
-
-  "timeline": {
+  {
+    "id": "RPT-1780052167434-579D14",
+    "type": "Pothole",
+    "severity": "high",
+    "road": "yammuna expresway",
+    "area": "noida",
+    "description": "",
+    "ai_label": "Pothole",
+    "ai_confidence": 0.95,
+    "image_filename": "download (1).jpg",
+    "lat": null,
+    "lng": null,
+    "reporter_name": "Anonymous",
+    "reporter_id": null,
+    "status": "pending",
     "created_at": "2026-05-29T10:56:07+00:00",
     "updated_at": "2026-05-29T10:56:07+00:00",
-    "resolved_at": null
+    "admin_note": ""
   },
-
-  "resolution": {
-    "admin_note": "",
-    "resolution_note": null,
-    "before_image": null,
-    "after_image": null
+  {
+    "id": "RPT-1780039529666-AA68F0",
+    "type": "Pothole",
+    "severity": "critical",
+    "road": "meerut",
+    "area": "dalampara tatiyon vali gali",
+    "description": "very bad road contains a lot of water and is very messy",
+    "ai_label": "Pothole",
+    "ai_confidence": 0.93,
+    "image_filename": "istockphoto-1191972293-612x612.jpg",
+    "lat": null,
+    "lng": null,
+    "reporter_name": "Anonymous",
+    "reporter_id": null,
+    "status": "resolved",
+    "created_at": "2026-05-29T07:25:29+00:00",
+    "updated_at": "2026-05-29T07:27:46+00:00",
+    "admin_note": "ordered for the construction"
   },
-
-  "engagement": {
-    "upvotes": 0,
-    "duplicate_reports": 0,
-    "views": 0
+  {
+    "id": "RPT-1779986758672-EC262D",
+    "type": "Waterlogging",
+    "severity": "medium",
+    "road": "hapud bus stand",
+    "area": "meerut",
+    "description": "",
+    "ai_label": null,
+    "ai_confidence": null,
+    "image_filename": null,
+    "lat": null,
+    "lng": null,
+    "reporter_name": "Anonymous",
+    "reporter_id": null,
+    "status": "pending",
+    "created_at": "2026-05-28T16:45:58+00:00",
+    "updated_at": "2026-05-28T16:45:58+00:00",
+    "admin_note": ""
+  },
+  {
+    "id": "RPT-1779986645576-37F44E",
+    "type": "Pothole",
+    "severity": "medium",
+    "road": "delhi road",
+    "area": "partapur",
+    "description": "",
+    "ai_label": "Surface Wear",
+    "ai_confidence": 0.84,
+    "image_filename": "sample_road_image_1779947798044.png",
+    "lat": null,
+    "lng": null,
+    "reporter_name": "harsh",
+    "reporter_id": "user-102107067c",
+    "status": "resolved",
+    "created_at": "2026-05-28T16:44:05+00:00",
+    "updated_at": "2026-05-28T16:45:07+00:00",
+    "admin_note": "done"
+  },
+  {
+    "id": "RPT-1779985967366-9350D0",
+    "type": "Damaged Road",
+    "severity": "high",
+    "road": "mavana road",
+    "area": "hapur",
+    "description": "",
+    "ai_label": "Damaged Road",
+    "ai_confidence": 0.87,
+    "lat": null,
+    "lng": null,
+    "reporter_name": "harsh",
+    "reporter_id": "user-102107067c",
+    "status": "pending",
+    "created_at": "2026-05-28T16:32:47+00:00",
+    "updated_at": "2026-05-28T16:32:47+00:00",
+    "admin_note": ""
+  },
+  {
+    "id": "RPT-1779985682037-3E8E63",
+    "type": "Pothole",
+    "severity": "high",
+    "road": "baghpat road",
+    "area": "meerut",
+    "description": "",
+    "ai_label": null,
+    "ai_confidence": null,
+    "lat": null,
+    "lng": null,
+    "reporter_name": "harsh",
+    "reporter_id": "user-102107067c",
+    "status": "resolved",
+    "created_at": "2026-05-28T16:28:02+00:00",
+    "updated_at": "2026-05-28T16:30:11+00:00",
+    "admin_note": ""
+  },
+  {
+    "id": "RPT-1779985472515-909E37",
+    "type": "Pothole",
+    "severity": "critical",
+    "road": "NH-48 KM 14",
+    "area": "Mahipalpur",
+    "description": "Big pothole near toll booth",
+    "ai_label": null,
+    "ai_confidence": null,
+    "lat": null,
+    "lng": null,
+    "reporter_name": "Demo User",
+    "reporter_id": "user-e6a7bb80dd",
+    "status": "resolved",
+    "created_at": "2026-05-28T16:24:32+00:00",
+    "updated_at": "2026-05-28T16:29:58+00:00",
+    "admin_note": ""
+  },
+  {
+    "id": "RPT-1779985398153-AA4FAF",
+    "type": "Pothole",
+    "severity": "critical",
+    "road": "NH-48",
+    "area": "Mahipalpur",
+    "description": "Test report",
+    "ai_label": null,
+    "ai_confidence": null,
+    "lat": null,
+    "lng": null,
+    "reporter_name": "Anonymous",
+    "reporter_id": null,
+    "status": "pending",
+    "created_at": "2026-05-28T16:23:18+00:00",
+    "updated_at": "2026-05-28T16:23:18+00:00",
+    "admin_note": ""
   }
-}
+]
