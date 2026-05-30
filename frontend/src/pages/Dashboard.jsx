@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import LanguageSelector from "../components/LanguageSelector";
 import { getIssues } from "../services/roadService";
 
@@ -301,8 +303,125 @@ function RecentIssues({ issues }) {
 }
 
 /* â”€â”€ Map placeholder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-function MapPlaceholder({ navigate }) {
-  const { t } = useTranslation();
+function LiveMap({ issues }) {
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markersLayerRef = useRef(null);
+
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+
+    // Initialize Leaflet map
+    const map = L.map(mapContainerRef.current, {
+      center: [28.6139, 77.2090], // Delhi center
+      zoom: 10,
+      zoomControl: false
+    });
+    mapRef.current = map;
+
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    // Use CartoDB Dark Matter tile layer for beautiful dark mode map
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      subdomains: 'abcd',
+      maxZoom: 20
+    }).addTo(map);
+
+    // Create a LayerGroup for markers
+    const markersLayer = L.layerGroup().addTo(map);
+    markersLayerRef.current = markersLayer;
+
+    // Clean up on unmount
+    return () => {
+      map.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mapRef.current || !markersLayerRef.current) return;
+
+    const map = mapRef.current;
+    const markersLayer = markersLayerRef.current;
+
+    // Clear existing markers
+    markersLayer.clearLayers();
+
+    const SEV_COLORS = {
+      critical: "#dc2626",
+      high: "#f97316",
+      medium: "#eab308",
+      low: "#22c55e"
+    };
+
+    const validMarkers = [];
+
+    issues.forEach(issue => {
+      const lat = parseFloat(issue.lat);
+      const lng = parseFloat(issue.lng);
+
+      if (isNaN(lat) || isNaN(lng)) return;
+
+      const severity = issue.severity || "medium";
+      const color = SEV_COLORS[severity] || "#eab308";
+      const issueType = issue.type || "Road Issue";
+
+      // Pulsing Marker Icon using L.divIcon
+      const icon = L.divIcon({
+        html: `
+          <div style="position: relative; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center;">
+            <div style="position: absolute; width: 10px; height: 10px; border-radius: 50%; background: ${color}; box-shadow: 0 0 8px ${color}; z-index: 2;"></div>
+            <div style="position: absolute; width: 24px; height: 24px; border-radius: 50%; background: ${color}; opacity: 0.4; animation: mapDotPulse 1.8s ease-in-out infinite; z-index: 1;"></div>
+          </div>
+        `,
+        className: 'custom-gps-marker',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+
+      const popupContent = `
+        <div style="
+          color: #e2e8f0;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 12px;
+          min-width: 140px;
+        ">
+          <div style="font-weight: bold; font-size: 13px; color: ${color}; margin-bottom: 4px; text-transform: uppercase; font-family: 'Bebas Neue', cursive; letter-spacing: 1px;">
+            ${issueType}
+          </div>
+          <div style="font-weight: 500; margin-bottom: 2px;">
+            📍 ${issue.road}${issue.area ? `, ${issue.area}` : ''}
+          </div>
+          <div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 6px;">
+            Severity: <span style="color: ${color}; font-weight: bold; text-transform: uppercase;">${severity}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px; margin-top: 6px;">
+            <span style="font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; padding: 1px 4px; border-radius: 3px; background: ${color}20; color: ${color}; border: 1px solid ${color}33;">
+              ${issue.status || 'pending'}
+            </span>
+            <span style="font-size: 9px; color: rgba(255,255,255,0.4);">
+              ${issue.id}
+            </span>
+          </div>
+        </div>
+      `;
+
+      const marker = L.marker([lat, lng], { icon })
+        .bindPopup(popupContent, {
+          closeButton: false,
+          className: 'custom-dark-popup'
+        });
+
+      markersLayer.addLayer(marker);
+      validMarkers.push([lat, lng]);
+    });
+
+    if (validMarkers.length > 0) {
+      const bounds = L.latLngBounds(validMarkers);
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+    }
+  }, [issues]);
+
   return (
     <div style={{
       background: "#080c14",
@@ -311,72 +430,25 @@ function MapPlaceholder({ navigate }) {
       overflow: "hidden",
       height: 320,
       position: "relative",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      cursor: "pointer",
-    }}
-      onClick={() => navigate("/dashboard")}
-    >
-      {/* Grid */}
-      <div style={{
-        position: "absolute", inset: 0,
-        backgroundImage: `
-          linear-gradient(rgba(59,130,246,0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(59,130,246,0.05) 1px, transparent 1px)
-        `,
-        backgroundSize: "40px 40px",
-      }} />
-      {/* Corner markers */}
-      {[["top:12px;left:12px","borderTop","borderLeft"],
-        ["top:12px;right:12px","borderTop","borderRight"],
-        ["bottom:12px;left:12px","borderBottom","borderLeft"],
-        ["bottom:12px;right:12px","borderBottom","borderRight"]].map(([pos], i) => (
-        <div key={i} style={{
-          position: "absolute", ...Object.fromEntries(pos.split(";").map(p=>p.split(":"))),
-          width: 16, height: 16,
-          borderTop: pos.includes("top:") ? "1.5px solid rgba(59,130,246,0.4)" : "none",
-          borderBottom: pos.includes("bottom:") ? "1.5px solid rgba(59,130,246,0.4)" : "none",
-          borderLeft: pos.includes("left:") ? "1.5px solid rgba(59,130,246,0.4)" : "none",
-          borderRight: pos.includes("right:") ? "1.5px solid rgba(59,130,246,0.4)" : "none",
-        }} />
-      ))}
-
-      {/* Pulsing dots */}
-      {[
-        { top: "35%", left: "28%", color: "#dc2626" },
-        { top: "55%", left: "55%", color: "#f97316" },
-        { top: "25%", left: "65%", color: "#dc2626" },
-        { top: "65%", left: "35%", color: "#eab308" },
-        { top: "45%", left: "75%", color: "#22c55e" },
-      ].map((dot, i) => (
-        <div key={i} style={{
-          position: "absolute",
-          top: dot.top, left: dot.left,
-          width: 10, height: 10,
-          borderRadius: "50%",
-          background: dot.color,
-          boxShadow: `0 0 12px ${dot.color}`,
-          animation: `mapDotPulse 2s ease-in-out ${i * 0.4}s infinite`,
-        }} />
-      ))}
-
-      <div style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
-        <div style={{
-          fontFamily: "'Bebas Neue',cursive",
-          fontSize: 18, letterSpacing: 3,
-          color: "rgba(255,255,255,0.3)",
-          marginBottom: 8,
-        }}>
-          {t("dashboardLive.liveMapView")}
-        </div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.2)", fontFamily: "'DM Mono',monospace" }}>
-          {t("dashboardLive.connectMaps")}
-        </div>
-      </div>
-
+    }}>
+      <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />
       <style>{`
         @keyframes mapDotPulse {
-          0%,100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.6); opacity: 0.5; }
+          0% { transform: scale(0.6); opacity: 0.8; }
+          100% { transform: scale(1.8); opacity: 0; }
+        }
+        .custom-dark-popup .leaflet-popup-content-wrapper {
+          background: #0d111b !important;
+          border: 1px solid rgba(255,255,255,0.08) !important;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+          border-radius: 8px !important;
+        }
+        .custom-dark-popup .leaflet-popup-tip {
+          background: #0d111b !important;
+          border: 1px solid rgba(255,255,255,0.08) !important;
+        }
+        .leaflet-container {
+          background: #060810 !important;
         }
       `}</style>
     </div>
@@ -491,7 +563,7 @@ export default function Dashboard() {
 
         {/* Map + Hotspot row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 12, marginBottom: 20 }}>
-          <MapPlaceholder navigate={navigate} />
+          <LiveMap issues={liveIssues} />
           <MiniHotspotChart zones={zones} />
         </div>
 

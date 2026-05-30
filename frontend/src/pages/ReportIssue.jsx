@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ImageUploader from "../components/RoadIssue/ImageUploader";
 import DetectionResult from "../components/RoadIssue/DetectionResult";
 import { submitIssue, uploadAndDetect } from "../services/roadService";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "../components/LanguageSelector";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    ReportIssue.jsx â€” AI-powered road issue reporting page
@@ -85,6 +87,137 @@ function simulateDetection(fileName) {
   return results[Math.floor(Math.random() * results.length)];
 }
 
+function MapPicker({ lat, lng, onChange }) {
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+
+    const startLat = lat || 28.6139;
+    const startLng = lng || 77.2090;
+
+    const map = L.map(mapContainerRef.current, {
+      center: [startLat, startLng],
+      zoom: 12,
+      zoomControl: false
+    });
+    mapRef.current = map;
+
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      subdomains: 'abcd',
+      maxZoom: 20
+    }).addTo(map);
+
+    if (lat && lng) {
+      const marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+      markerRef.current = marker;
+
+      marker.on('dragend', () => {
+        const position = marker.getLatLng();
+        onChange(position.lat, position.lng);
+      });
+    }
+
+    map.on('click', (e) => {
+      const { lat: clickLat, lng: clickLng } = e.latlng;
+      if (markerRef.current) {
+        markerRef.current.setLatLng(e.latlng);
+      } else {
+        const marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+        markerRef.current = marker;
+
+        marker.on('dragend', () => {
+          const position = marker.getLatLng();
+          onChange(position.lat, position.lng);
+        });
+      }
+      onChange(clickLat, clickLng);
+    });
+
+    if (!lat && !lng && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const uLat = position.coords.latitude;
+          const uLng = position.coords.longitude;
+          map.setView([uLat, uLng], 14);
+          
+          if (markerRef.current) {
+            markerRef.current.setLatLng([uLat, uLng]);
+          } else {
+            const marker = L.marker([uLat, uLng], { draggable: true }).addTo(map);
+            markerRef.current = marker;
+            marker.on('dragend', () => {
+              const pos = marker.getLatLng();
+              onChange(pos.lat, pos.lng);
+            });
+          }
+          onChange(uLat, uLng);
+        },
+        () => {}
+      );
+    }
+
+    return () => {
+      map.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (lat && lng) {
+      const currentCenter = mapRef.current.getCenter();
+      if (mapRef.current.distance(currentCenter, [lat, lng]) > 1000) {
+        mapRef.current.setView([lat, lng]);
+      }
+      if (markerRef.current) {
+        markerRef.current.setLatLng([lat, lng]);
+      } else {
+        const marker = L.marker([lat, lng], { draggable: true }).addTo(mapRef.current);
+        markerRef.current = marker;
+        marker.on('dragend', () => {
+          const pos = marker.getLatLng();
+          onChange(pos.lat, pos.lng);
+        });
+      }
+    }
+  }, [lat, lng]);
+
+  return (
+    <div style={{
+      height: 180,
+      background: "#080c14",
+      border: "1px solid rgba(255,255,255,0.06)",
+      borderRadius: 10,
+      overflow: "hidden",
+      position: "relative",
+      marginBottom: 10
+    }}>
+      <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />
+      <div style={{
+        position: "absolute",
+        bottom: 6,
+        left: 6,
+        background: "rgba(13,17,27,0.85)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 4,
+        padding: "2px 6px",
+        fontSize: 9,
+        color: "rgba(255,255,255,0.5)",
+        pointerEvents: "none",
+        zIndex: 1000,
+        fontFamily: "'DM Mono', monospace"
+      }}>
+        {lat && lng ? `LAT: ${lat.toFixed(4)}, LNG: ${lng.toFixed(4)}` : "Click map to set location pin"}
+      </div>
+    </div>
+  );
+}
+
 export default function ReportIssue() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -101,6 +234,8 @@ export default function ReportIssue() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [reportId, setReportId] = useState("");
+  const [lat, setLat] = useState(null);
+  const [lng, setLng] = useState(null);
 
   async function handleFile(file) {
     if (!file || !file.type.startsWith("image/")) return;
@@ -144,6 +279,29 @@ export default function ReportIssue() {
     }
   }
 
+  const fetchAddress = async (latVal, lngVal) => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latVal}&lon=${lngVal}&format=json&accept-language=en`);
+      if (res.ok) {
+        const data = await res.json();
+        const address = data.address || {};
+        const roadName = address.road || address.pedestrian || address.suburb || address.neighbourhood || address.highway || "";
+        const areaName = address.city_district || address.city || address.county || address.state || "";
+        
+        if (roadName) setRoad(roadName);
+        if (areaName) setArea(areaName);
+      }
+    } catch {
+      // Fallback silently
+    }
+  };
+
+  const handleLocationChange = (newLat, newLng) => {
+    setLat(newLat);
+    setLng(newLng);
+    fetchAddress(newLat, newLng);
+  };
+
   async function handleSubmit() {
     if (!road.trim()) return;
     setSubmitting(true);
@@ -158,6 +316,8 @@ export default function ReportIssue() {
         aiLabel: result?.label || null,
         aiConfidence: result?.confidence || null,
         imageFilename: savedFilename || null,
+        lat: lat,
+        lng: lng,
       });
       setReportId(data.issueId || "");
       setSubmitted(true);
@@ -189,7 +349,7 @@ export default function ReportIssue() {
               {t("reportIssuePage.submittedMessage")}
             </div>
             <div style={{ display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap" }}>
-              <button onClick={() => { setSubmitted(false); setPreview(null); setResult(null); setRoad(""); setArea(""); setDesc(""); setReportId(""); }}
+              <button onClick={() => { setSubmitted(false); setPreview(null); setResult(null); setRoad(""); setArea(""); setDesc(""); setReportId(""); setLat(null); setLng(null); }}
                 style={{ padding:"10px 22px",borderRadius:8,border:"1px solid rgba(255,255,255,0.1)",background:"transparent",color:"rgba(255,255,255,0.6)",fontSize:13,cursor:"pointer",fontFamily:"'DM Sans',sans-serif" }}>
                 {t("reportIssuePage.reportAnother")}
               </button>
@@ -281,6 +441,12 @@ export default function ReportIssue() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Map Location Picker */}
+            <div>
+              <label className="ri-label">Pin Location on Map (Optional)</label>
+              <MapPicker lat={lat} lng={lng} onChange={handleLocationChange} />
             </div>
 
             {/* Road */}

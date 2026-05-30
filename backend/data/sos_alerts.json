@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "alert_id": "SOS-20260530072541545261",
+    "user_name": "Raksha AI User",
+    "user_id": "user-123",
+    "timestamp": "2026-05-30T07:25:41+00:00",
+    "status": "dispatched",
+    "location": {
+      "lat": 28.6139,
+      "lng": 77.209,
+      "source": "test"
+    },
+    "emergency_contacts": [
+      "+91-9999999999"
+    ],
+    "contacts_notified": 1,
+    "note": "Automated test incident",
+    "device_info": {
+      "platform": "web"
+    }
+  },
+  {
+    "alert_id": "SOS-20260529184846391975",
+    "user_name": "Raksha AI User",
+    "user_id": "user-123",
+    "timestamp": "2026-05-29T18:48:46+00:00",
+    "status": "dispatched",
+    "location": {
+      "lat": 28.6139,
+      "lng": 77.209,
+      "source": "test"
+    },
+    "emergency_contacts": [
+      "+91-9999999999"
+    ],
+    "contacts_notified": 1,
+    "note": "Automated test incident",
+    "device_info": {
+      "platform": "web"
+    }
+  },
+  {
+    "alert_id": "SOS-20260529184704160719",
+    "user_name": "Raksha AI User",
+    "user_id": "user-123",
+    "timestamp": "2026-05-29T18:47:04+00:00",
+    "status": "dispatched",
+    "location": {
+      "lat": 28.6139,
+      "lng": 77.209,
+      "source": "test"
+    },
+    "emergency_contacts": [
+      "+91-9999999999"
+    ],
+    "contacts_notified": 1,
+    "note": "Automated test incident",
+    "device_info": {
+      "platform": "web"
+    }
+  }
+]
