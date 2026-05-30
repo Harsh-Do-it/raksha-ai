@@ -2,38 +2,125 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getIssueById } from "../services/roadService";
+import LanguageSelector from "../components/LanguageSelector";
 
 function PageShell({ title, subtitle, children, navigate, activeNav }) {
   const { t } = useTranslation();
   const links = [
-    { key:"home",labelKey:"navigation.home",path:"/" },
-    { key:"dashboard",labelKey:"navigation.dashboard",path:"/dashboard" },
-    { key:"sos",labelKey:"navigation.sos",path:"/sos" },
-    { key:"report-issue",labelKey:"navigation.reportIssue",path:"/report-issue" },
-    { key:"risk-alert",labelKey:"navigation.riskAlertPlural",path:"/risk-alert" },
-    { key:"legal-info",labelKey:"navigation.legal",path:"/legal-info" },
-    { key:"status",labelKey:"navigation.checkStatus",path:"/status" },
+    { key: "home", labelKey: "navigation.home", path: "/" },
+    { key: "dashboard", labelKey: "navigation.dashboard", path: "/dashboard" },
+    { key: "sos", labelKey: "navigation.sos", path: "/sos" },
+    { key: "report-issue", labelKey: "navigation.reportIssue", path: "/report-issue" },
+    { key: "risk-alert", labelKey: "navigation.riskAlertPlural", path: "/risk-alert" },
+    { key: "legal-info", labelKey: "navigation.legal", path: "/legal-info" },
+    { key: "status", labelKey: "navigation.checkStatus", path: "/status" },
   ];
+
   return (
-    <div style={{ minHeight:"100vh",background:"#060810",color:"#e2e8f0",fontFamily:"'DM Sans',sans-serif",display:"flex",flexDirection:"column" }}>
-      <div style={{ position:"sticky",top:0,zIndex:100,background:"rgba(6,8,16,0.96)",borderBottom:"1px solid rgba(255,255,255,0.06)",backdropFilter:"blur(12px)",padding:"0 24px",height:56,display:"flex",alignItems:"center",justifyContent:"space-between",gap:16 }}>
-        <div style={{ display:"flex",alignItems:"center",gap:20 }}>
-          <div style={{ cursor:"pointer",display:"flex",alignItems:"center",gap:8 }} onClick={() => navigate("/")}>
-            <svg width="28" height="28" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="25" fill="#0d111b" stroke="rgba(220,38,38,0.3)" strokeWidth="1"/><path d="M26 8 L40 15 L40 28 C40 36 26 44 26 44 C26 44 12 36 12 28 L12 15 Z" fill="#dc2626" fillOpacity="0.2" stroke="#dc2626" strokeWidth="1.5" strokeLinejoin="round"/><text x="26" y="32" textAnchor="middle" fill="#f1f5f9" fontSize="13" fontFamily="'Bebas Neue',cursive" letterSpacing="2">RA</text></svg>
-            <span style={{ fontFamily:"'Bebas Neue',cursive",fontSize:15,letterSpacing:2.5,color:"#f1f5f9" }}>RAKSHA AI</span>
+    <div style={{
+      minHeight: "100vh",
+      background: "#060810",
+      color: "#e2e8f0",
+      fontFamily: "'DM Sans', sans-serif",
+      display: "flex",
+      flexDirection: "column",
+    }}>
+      {/* Top bar */}
+      <div style={{
+        position: "sticky", top: 0, zIndex: 100,
+        background: "rgba(6,8,16,0.96)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        backdropFilter: "blur(12px)",
+        padding: "0 24px",
+        height: 60,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        gap: 16,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <div style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
+            onClick={() => navigate("/")}>
+            <svg width="36" height="36" viewBox="0 0 52 52" fill="none">
+              <circle cx="26" cy="26" r="25" fill="#0d111b" stroke="rgba(220,38,38,0.3)" strokeWidth="1"/>
+              <path d="M26 8 L40 15 L40 28 C40 36 26 44 26 44 C26 44 12 36 12 28 L12 15 Z"
+                fill="#dc2626" fillOpacity="0.15" stroke="#dc2626" strokeWidth="1.5" strokeLinejoin="round"/>
+              <text x="26" y="32" textAnchor="middle" fill="#f1f5f9" fontSize="14"
+                fontFamily="'Bebas Neue',cursive" letterSpacing="2">RA</text>
+            </svg>
+            <div>
+              <div style={{
+                fontFamily: "'Bebas Neue', cursive",
+                fontSize: 18, letterSpacing: 3, color: "#f1f5f9", lineHeight: 1,
+              }}>RAKSHA AI</div>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", letterSpacing: "1.5px", fontFamily: "'DM Mono',monospace" }}>
+                ROAD SAFETY ECOSYSTEM
+              </div>
+            </div>
           </div>
-          <div style={{ display:"flex",gap:2,borderLeft:"1px solid rgba(255,255,255,0.06)",paddingLeft:16 }}>
-            {links.map(l => <button key={l.key} onClick={()=>navigate(l.path)} style={{ background:activeNav===l.key?"rgba(220,38,38,0.12)":"none",border:activeNav===l.key?"1px solid rgba(220,38,38,0.25)":"1px solid transparent",borderRadius:6,cursor:"pointer",padding:"4px 11px",fontSize:11,fontWeight:500,color:activeNav===l.key?"#f87171":"rgba(255,255,255,0.85)",fontFamily:"'DM Sans',sans-serif",transition:"all 0.15s",whiteSpace:"nowrap" }}>{t(l.labelKey, l.labelKey.split('.').pop())}</button>)}
+
+          <div style={{
+            display: "flex", gap: 2,
+            borderLeft: "1px solid rgba(255,255,255,0.06)", paddingLeft: 16,
+          }}>
+            {links.map(l => (
+              <button key={l.key} onClick={() => navigate(l.path)} style={{
+                background: activeNav === l.key ? "rgba(220,38,38,0.12)" : "none",
+                border: activeNav === l.key ? "1px solid rgba(220,38,38,0.25)" : "1px solid transparent",
+                borderRadius: 6, cursor: "pointer",
+                padding: "6px 13px",
+                fontSize: 12, fontWeight: 500,
+                color: activeNav === l.key ? "#f87171" : "rgba(255,255,255,0.85)",
+                fontFamily: "'DM Sans',sans-serif",
+                transition: "all 0.15s",
+                whiteSpace: "nowrap",
+              }}>
+                {t(l.labelKey)}
+              </button>
+            ))}
           </div>
         </div>
-        <button onClick={()=>navigate("/sos")} style={{ padding:"6px 16px",borderRadius:7,background:"#dc2626",border:"none",color:"white",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:"0.5px",boxShadow:"0 0 16px rgba(220,38,38,0.35)",fontFamily:"'DM Sans',sans-serif",flexShrink:0 }}>SOS</button>
+
+        <LanguageSelector />
+        <button onClick={() => navigate("/sos")} style={{
+          padding: "7px 18px", borderRadius: 8,
+          background: "#dc2626", border: "none",
+          color: "white", fontSize: 12, fontWeight: 700,
+          cursor: "pointer", letterSpacing: "0.5px",
+          boxShadow: "0 0 20px rgba(220,38,38,0.35)",
+          fontFamily: "'DM Sans',sans-serif",
+          flexShrink: 0,
+        }}>SOS</button>
       </div>
-      <div style={{ padding:"20px 28px 8px",borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
-        <div style={{ fontFamily:"'DM Mono',monospace",fontSize:10,letterSpacing:2,color:"rgba(255,255,255,0.25)",marginBottom:6 }}>RAKSHA AI / {t(title).toUpperCase()}</div>
-        <div style={{ fontFamily:"'Bebas Neue',cursive",fontSize:28,letterSpacing:3,color:"#f1f5f9",lineHeight:1 }}>{t(title)}</div>
-        {subtitle && <div style={{ fontSize:12,color:"rgba(255,255,255,0.3)",marginTop:5 }}>{t(subtitle)}</div>}
+
+      {/* Page header */}
+      <div style={{
+        padding: "28px 28px 20px",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
+      }}>
+        <div style={{
+          fontFamily: "'DM Mono',monospace",
+          fontSize: 10, letterSpacing: 2, color: "rgba(255,255,255,0.25)",
+          marginBottom: 6,
+        }}>
+          RAKSHA AI / {t(title).toUpperCase()}
+        </div>
+        <div style={{
+          fontFamily: "'Bebas Neue',cursive",
+          fontSize: 28, letterSpacing: 3, color: "#f1f5f9", lineHeight: 1,
+        }}>
+          {t(title)}
+        </div>
+        {subtitle && (
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginTop: 5 }}>
+            {t(subtitle)}
+          </div>
+        )}
       </div>
-      <div style={{ flex:1,padding:"24px 28px",overflowY:"auto" }}>{children}</div>
+
+      <div style={{ flex: 1, padding: "24px 28px", overflowY: "auto" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%" }}>
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
@@ -83,7 +170,7 @@ export default function CheckStatus() {
         .status-btn:disabled { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.3); cursor:not-allowed; }
       `}</style>
       <PageShell title="checkStatusPage.title" subtitle="checkStatusPage.subtitle" navigate={navigate} activeNav="status">
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: "20px 0" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", padding: "20px 0" }}>
           
           <form onSubmit={handleSearch} style={{ display:"flex", gap:12, marginBottom:40 }}>
             <input 

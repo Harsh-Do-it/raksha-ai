@@ -396,20 +396,34 @@ export default function AdminPage() {
         {/* Top bar */}
         <div style={{
           position: "sticky", top: 0, zIndex: 100,
-          background: "rgba(6,8,16,0.97)", borderBottom: "1px solid rgba(255,255,255,0.06)",
-          backdropFilter: "blur(12px)", padding: "0 24px", height: 56,
+          background: "rgba(6,8,16,0.96)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          backdropFilter: "blur(12px)",
+          padding: "0 24px",
+          height: 60,
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
-              <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            <div style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
+              onClick={() => navigate("/")}>
+              <svg width="36" height="36" viewBox="0 0 52 52" fill="none">
                 <circle cx="26" cy="26" r="25" fill="#0d111b" stroke="rgba(220,38,38,0.3)" strokeWidth="1"/>
-                <path d="M26 8 L40 15 L40 28 C40 36 26 44 26 44 C26 44 12 36 12 28 L12 15 Z" fill="#dc2626" fillOpacity="0.2" stroke="#dc2626" strokeWidth="1.5" strokeLinejoin="round"/>
-                <text x="26" y="32" textAnchor="middle" fill="#f1f5f9" fontSize="13" fontFamily="'Bebas Neue',cursive" letterSpacing="2">RA</text>
+                <path d="M26 8 L40 15 L40 28 C40 36 26 44 26 44 C26 44 12 36 12 28 L12 15 Z"
+                  fill="#dc2626" fillOpacity="0.15" stroke="#dc2626" strokeWidth="1.5" strokeLinejoin="round"/>
+                <text x="26" y="32" textAnchor="middle" fill="#f1f5f9" fontSize="14"
+                  fontFamily="'Bebas Neue',cursive" letterSpacing="2">RA</text>
               </svg>
+              <div>
+                <div style={{
+                  fontFamily: "'Bebas Neue', cursive",
+                  fontSize: 18, letterSpacing: 3, color: "#f1f5f9", lineHeight: 1,
+                }}>RAKSHA AI</div>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", letterSpacing: "1.5px", fontFamily: "'DM Mono',monospace" }}>
+                  ROAD SAFETY ECOSYSTEM
+                </div>
+              </div>
             </div>
-            <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 16, letterSpacing: 3, color: "#f1f5f9" }}>RAKSHA AI</div>
-            <div style={{ padding: "3px 10px", borderRadius: 6, background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)", fontSize: 10, color: "#a78bfa", fontFamily: "'DM Mono',monospace", letterSpacing: 1 }}>
+            <div style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)", fontSize: 10, color: "#a78bfa", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginLeft: -4 }}>
               ADMIN PANEL
             </div>
           </div>
@@ -417,16 +431,17 @@ export default function AdminPage() {
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'DM Mono',monospace" }}>
               {user?.name} · {user?.email}
             </div>
-            <button onClick={() => navigate("/dashboard")} style={{ padding: "5px 14px", borderRadius: 7, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.5)", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+            <button onClick={() => navigate("/dashboard")} style={{ padding: "6px 13px", borderRadius: 7, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.5)", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
               Dashboard
             </button>
-            <button onClick={handleLogout} style={{ padding: "5px 14px", borderRadius: 7, border: "1px solid rgba(220,38,38,0.25)", background: "rgba(220,38,38,0.08)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+            <button onClick={handleLogout} style={{ padding: "6px 13px", borderRadius: 7, border: "1px solid rgba(220,38,38,0.25)", background: "rgba(220,38,38,0.08)", color: "#f87171", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
               Logout
             </button>
           </div>
         </div>
 
         <div style={{ padding: "28px 28px" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%" }}>
 
           {/* Page header */}
           <div style={{ marginBottom: 24 }}>
@@ -569,6 +584,7 @@ export default function AdminPage() {
               )}
             </>
           )}
+          </div>
         </div>
       </div>
 
